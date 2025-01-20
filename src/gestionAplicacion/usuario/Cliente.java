@@ -46,5 +46,30 @@ public class Cliente implements Serializable{
   private int origenMembresia;
   private ArrayList<MetodoPago> metodosDePago = new ArrayList<>();
 
-  //Constructores 
+  //Constructores
+  public Cliente(){
+    SucursalCine.getClientes().add(this);
+  }
+
+
+  public Cliente (String nombre, int edad, long documento, TipoDeDocumento tipoDocumento) {
+    this();
+    this.nombre = nombre;
+    this.documento = documento;
+    this.tipoDocumento = tipoDocumento;
+    puntos = 0;
+    
+  }
+
+  public Cliente(String nombre, ArrayList<Pelicula> historialDePeliculas, ArrayList<Producto> historialDePedidos, ArrayList<Ticket> ticket,
+			int edad, Membresia membresia, long documento, LocalDate fechaLimiteMembresia,
+			TipoDeDocumento tipoDocumento, TarjetaCinemar cuenta, ArrayList<MetodoPago> metodosDePago,
+			ArrayList<String> codigosDescuento) {
+    this()
+      }
+
+
+
+                 
 }
+
