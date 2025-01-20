@@ -165,3 +165,47 @@ public class Producto implements Serializable {
 	public void setCantidad(int cantidad) {
 		this.cantidad = cantidad;
 	}
+
+	public String getGenero() {
+		return genero;
+	}
+
+	public void setGenero(String genero) {
+		this.genero = genero;
+	}
+
+	public double getValoracionComida() {
+		return valoracionComida;
+	}
+
+	public void setValoracionComida(double valoracionComida) {
+		this.valoracionComida = valoracionComida;
+	}
+
+	public int getTotalEncuestasDeValoracionRealizadasComida() {
+		return totalEncuestasDeValoracionRealizadasComida;
+	}
+
+	public void setTotalEncuestasDeValoracionRealizadasComida(int totalEncuestasDeValoracionRealizadasComida) {
+		this.totalEncuestasDeValoracionRealizadasComida = totalEncuestasDeValoracionRealizadasComida;
+	}
+
+	public boolean isStrikeCambio() {
+		return strikeCambio;
+	}
+
+	public void setStrikeCambio(boolean strikeCambio) {
+		this.strikeCambio = strikeCambio;
+	}
+
+	public SucursalCine getSucursalSede() {
+		return sucursalSede;
+	}
+
+	public void setSucursalSede(SucursalCine sucursalSede) {
+		this.sucursalSede = sucursalSede;
+	}
+
+
+	
+}
