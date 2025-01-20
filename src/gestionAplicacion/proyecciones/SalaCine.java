@@ -181,4 +181,317 @@ public class SalaCine implements Serializable{
 		return resultado.toString();
 	}
 	
+	/**
+	 * Description: Este método se encarga de verificar si una persona tiene al menos un ticket registrado en su array que cumpla los 
+	 * siguientes criterios para ingresar a la sala de cine:
+	 * <ol>
+	 * <li> La película asociada al ticket coincide con la pelicula en presentacion de la sala de cine.</li>
+	 * <li> La fecha actual es anterior a la fecha en que finaliza la película.</li>
+	 * <li>La sala de cine asociada al ticket es la misma que la sala de cine que ejecuta este método.</li>
+	 * </ol>
+	 * @param cliente : Este método solicita al cliente (De tipo cliente) que va a ingresar a la SalaDeCine.
+	 * @return <b>boolean</b> : Este método se encarga de retornar un boolean que será el resultado del proceso de verificación de entrada 
+	 * a la sala de Cine.
+	 * */
+	public boolean verificarTicket(Cliente cliente) {
+		
+		boolean verificacionIngresoASala = false;
+		boolean verificacionPelicula = false;
+		boolean verificacionSalaCine = false;
+		boolean verificacionHorario = false;
+		Ticket ticketVerificado = null;
+		
+		//Verificamos si el atributo película de alguno de los tickets que tiene el cliente coinicide con la película en presentación
+		//Verificamos si el atributo salaDeCine de ticket tiene asociado esta sala de cine
+		//Verificamos si la fecha de actual no excede a la fecha en la que se presentaba la película más la duración de la misma
+		for (Ticket ticket : cliente.getTickets()) {
+			
+			verificacionSalaCine = ticket.getSalaDeCine().equals(this);
+			
+			verificacionPelicula = ticket.getPelicula().equals(this.peliculaEnPresentacion);
+			
+			verificacionHorario = ticket.getHorario().equals(this.horarioPeliculaEnPresentacion) &
+			SucursalCine.getFechaActual().isBefore(this.horarioPeliculaEnPresentacion.plus( this.peliculaEnPresentacion.getDuracion() ) ); 
+
+			verificacionIngresoASala = verificacionPelicula & verificacionHorario & verificacionSalaCine;
+			
+			//En caso de encontrarlo rompemos el ciclo
+			if (verificacionIngresoASala) {
+				ticketVerificado = ticket;
+				break;
+			}
+		}
+		
+		//Eliminamos la referencia del ticket verificado, en caso de que la verificación sea correcta, del array de tickets del cliente
+		//Añadimos la película vista al historial de películas del cliente
+		//En caso de que sea la primera vez que ve la película, la añadimos al array de películas para calificar
+		if (verificacionIngresoASala) {
+			
+			if (!cliente.getHistorialDePeliculas().contains(ticketVerificado.getPelicula())) {
+				cliente.getPeliculasDisponiblesParaCalificar().add(ticketVerificado.getPelicula());
+			}
+
+			cliente.getHistorialDePeliculas().add(ticketVerificado.getPelicula());
+			
+			cliente.getTickets().remove(ticketVerificado);
+			
+	    }
+		
+		//Retornamos el resultado de la verificación
+		return verificacionIngresoASala;
+	}
+	
+	/**
+	 * Description: Este método se encarga actualizar la película en presentación, según los siguientes criterios: 
+	 * <ol>
+	 * <li>La sala de cine en que se presentará alguna de las películas en cartelera de la sucursal de cine 
+	 * coincide con alguna de las salas de cine de esta. </li>
+	 * <li>Revisamos si esa película tiene algún horario cercano o igual a la fecha actual durante el cuál estará o esta siendo presentada.</li>
+	 * </ol>
+	 * una vez hecho esto y cumpla con los dos criterios anteriores, limpiamos los asientos de la sala de cine, cambiando su disponibilidad a libre, y
+	 * por último actualizamos la información de la disponibilidad de los asientos, tomando como referencia la información de los asientos virtuales 
+	 * que coincidieron en fecha y hora de la película en presentación, además modificamos el atributo horario pelicula en presentación
+	 * y pelicula en presentación de la sala de cine.
+	 * */
+	public void actualizarPeliculasEnPresentacion() {
+		
+		Pelicula peliculaPresentacion = null;
+		LocalDateTime horarioPresentacion = null;
+		
+		LocalDateTime horarioMasCercanoAlActual = null;
+		boolean firstTimeComparacionHorario = true;
+		
+		boolean firstTimePosiblePeliculaPresentacionEncontrada = true;
+		
+		//Actualizamos la película
+		for (Pelicula pelicula : ubicacionSede.getCartelera()) {
+			
+			//Verificamos si la película tiene el mismo número de sala y tipo de formato que la sala de cine que ejecuta el método
+			if ( pelicula.getSalaPresentacion().equals(this) ) {
+				
+				firstTimeComparacionHorario = true;
+
+				//Para evitar que haga la comparación y le settee una película con un horario que no le corresponde
+				if (pelicula.filtrarHorariosPeliculaParaSalaCine().size() == 0) {
+					continue;
+				}
+				
+				for (LocalDateTime horario : pelicula.filtrarHorariosPeliculaParaSalaCine()) {
+					//Si es la primera vez que se realiza la comparación los setteamos como el valor más cercano al actual
+					if (firstTimeComparacionHorario) {
+						horarioMasCercanoAlActual = horario;
+						firstTimeComparacionHorario = false;
+					}
+					
+					//Si el horario es después del más cercano al actual y además no es después a la hora actual
+					if ( (horario.isAfter(horarioMasCercanoAlActual)) && !(horario.isAfter(SucursalCine.getFechaActual())) ) {
+						//Lo setteamos como el más cercano al actual
+						horarioMasCercanoAlActual = horario;
+					}
+					
+				}
+				
+				//Este try es para dos casos: 
+				//1. No hay películas en presentación en el horario actual o la película no tenía horarios disponibles (Error en el if).
+				//2. Es la primera vez que se realiza este proceso (Serialización o arranque del programa fuera de la jornada laboral) (Error en el else if).
+				try {
+					//Si el horarioMasCercanoAlActual es anterior o igual a la fecha actual, y es la primera vez que realizamos el proceso.
+					//O si el horarioMasCercanoAlActual es anterior o igual a la fecha actual y este es posterior a al horario más cercano encontrado
+					// previmente de una película cuya sala coincida también. (De esta forma no importa el orden en el que las 
+					// películas sean analizadas y se garantiza que siempre estará la película más reciente).
+					if ( !(horarioMasCercanoAlActual.isAfter(SucursalCine.getFechaActual()) ) && firstTimePosiblePeliculaPresentacionEncontrada ) {
+						horarioPresentacion = horarioMasCercanoAlActual;
+						peliculaPresentacion = pelicula;
+						firstTimePosiblePeliculaPresentacionEncontrada = false;
+					
+					}else if( !(horarioMasCercanoAlActual.isAfter(SucursalCine.getFechaActual()) ) && 
+							( horarioMasCercanoAlActual.isAfter(horarioPresentacion))  ){
+						horarioPresentacion = horarioMasCercanoAlActual;
+						peliculaPresentacion = pelicula;
+					}
+				}catch (NullPointerException e) {
+					continue;
+				}
+			}
+		} 
+		
+		//Ejecutamos esta operación en caso de que se haya encontrado un cambio para la película en presentación
+		if (peliculaPresentacion != null) {
+			this.setPeliculaEnPresentacion(peliculaPresentacion);
+			this.setHorarioPeliculaEnPresentacion(horarioPresentacion);
+			
+			//Actualizamos los asientos de la sala de cine
+			for (int i = 0; i < this.asientos.length; i++) {
+		        for (int j = 0; j < this.asientos[i].length; j++) {
+		        	//Preparamos los asientos para ser actualizados cambiando su disponibilidad a libre
+		        	this.cambiarDisponibilidadAsientoOcupadoParaLibre(i+1, j+1);
+		        	//Actualizamos el asiento según la información de la sala de cine virtual
+		        	if (!this.peliculaEnPresentacion.isDisponibilidadAsientoSalaVirtual(horarioPresentacion, i+1, j+1)) {
+		            this.cambiarDisponibilidadAsientoLibreParaOcupado(i+1, j+1);
+		        	}
+		        }
+		    }
+			
+		}
+		
+	}
+	
+	/**
+	 * Description : Este método se encarga de retornar la disponibilidad de un asiento dada su fila y su columna.
+	 * @param fila : Este método recibe la fila del asiento a consultar (De tipo int).
+	 * @param columna : Este método recibe la columna del asiento a consultar (De tipo int).
+	 * @return <b>boolean</b> : Este método retorna la disponibilidad del asiento consultado.
+	 * */
+	public boolean isDisponibilidadAsiento(int fila, int columna) {
+		return this.asientos[fila - 1][columna - 1].isDisponibilidad();
+		
+	}
+	
+	/**
+	 * Description : Este método se encarga de generar un string, que se imprimirá en pantalla, para visualizar los
+	 * asientos con su respectivo número de asiento.
+	 * @return <b>String</b> : Este método retorna un string que será impreso en pantalla para que el cliente 
+	 * pueda visualizar de mejor forma el proceso de entrada a la sala de cine.
+	 * */
+	public String mostrarAsientosParaPantalla() {
+		StringBuilder resultado = new StringBuilder("\n");
+	    resultado.append("  -------------------------------------------------------------- \n                           Pantalla\n");
+	    resultado.append("    ");
+	    resultado.append("\n");
+	    resultado.append("                       Asientos de Sala\n");
+	    
+	    // Mostrar asientos
+	    for (int i = 0; i < this.asientos.length; i++) {
+	    	resultado.append("         ");
+	        for (int j = 0; j < this.asientos[i].length; j++) {
+	            resultado.append("[");
+	            resultado.append(this.asientos[i][j].getNumeroAsiento());
+	            resultado.append("] ");
+	        }
+	        resultado.append("\n");
+	    }
+
+	    return resultado.toString();
+	}
+	
+	
+	
+	/**
+	 * Description : Este método se encarga de generar un string que se imprimirá en pantalla para visualizar los
+	 * la pantalla de la sala de cine con un pequeño mensaje, además se llama al método mostrarAsientosParaPantalla.
+	 * @return <b>String</b> : Este método retorna un string que será impreso en pantalla para que el cliente 
+	 * pueda visualizar de mejor forma el proceso de entrada a la sala de cine.
+	 * */
+	public String mostrarPantallaSalaCine () {
+		StringBuilder resultado = new StringBuilder("  -------------------------------------------------------------- ");
+		
+		for (int i = 0; i < 6; i++) {
+			resultado.append("\n" + " |                      					|");
+		}
+		
+		resultado.append("\n |             Programación Orientada a objetos			|");
+		
+		for (int i = 0; i < 6; i++) {
+			resultado.append("\n |                      					|");
+		}
+		
+		resultado.append(this.mostrarAsientosParaPantalla());
+		
+		return resultado.toString();
+	}
+	
+	/**
+	 * Description : Este método se encarga de revisar si una sala de cine tendrá durante ese día más películas en presentación.
+	 * @return <b>boolean</b> : retorna el estado de la validación.
+	 * */
+	public boolean tieneHorariosPresentacionHoy() {
+		
+		boolean isHorarioEncontrado = false;		
+		
+		for (Pelicula pelicula : ubicacionSede.getCartelera()) {
+			if (pelicula.getSalaPresentacion().equals(this)) {
+				for (LocalDateTime horario : pelicula.filtrarHorariosPeliculaParaSalaCine()) {
+					
+					if (horario.plus(pelicula.getDuracion()).isAfter(SucursalCine.getFechaActual())) {
+						isHorarioEncontrado = true;
+						break;
+					}
+				}
+				
+				if (isHorarioEncontrado) {
+					break;
+				}
+			}
+		}
+		
+		return isHorarioEncontrado;
+		
+	}
+	
+	// Getters and Setters
+	public Pelicula getPeliculaEnPresentacion() {
+		return peliculaEnPresentacion;
+	}
+
+	public void setPeliculaEnPresentacion(Pelicula peliculaEnPresentacion) {
+		this.peliculaEnPresentacion = peliculaEnPresentacion;
+	}
+	
+	public LocalDateTime getHorarioPeliculaEnPresentacion() {
+		return horarioPeliculaEnPresentacion;
+	}
+	
+	public void setHorarioPeliculaEnPresentacion(LocalDateTime horarioPeliculaEnPresentacion) {
+		this.horarioPeliculaEnPresentacion = horarioPeliculaEnPresentacion;
+	}
+	
+	public int getNumeroSala() {
+		return numeroSala;
+	}
+
+	public void setNumeroSala(int numeroSala) {
+		this.numeroSala = numeroSala;
+	}
+
+	public String getTipoDeSala() {
+		return tipoDeSala;
+	}
+
+	public void setTipoDeSala(String tipoDeSala) {
+		this.tipoDeSala = tipoDeSala;
+	}
+	
+	public Asiento[][] getAsientos() {
+		return asientos;
+	}
+
+	public void setAsientos(Asiento[][] asientos) {
+		this.asientos = asientos;
+	}
+
+	public SucursalCine getUbicacionSede() {
+		return ubicacionSede;
+	}
+
+	public void setUbicacionSede(SucursalCine ubicacionSede) {
+		this.ubicacionSede = ubicacionSede;
+	}
+
+	public int getIdSalaCine() {
+		return idSalaCine;
+	}
+
+	public void setIdSalaCine(int idSalaCine) {
+		this.idSalaCine = idSalaCine;
+	}
+
+	public static int getCantidadSalasDeCineCreadas() {
+		return cantidadSalasDeCineCreadas;
+	}
+
+	public static void setCantidadSalasDeCineCreadas(int cantidadSalasDeCineCreadas) {
+		SalaCine.cantidadSalasDeCineCreadas = cantidadSalasDeCineCreadas;
+	}
+
 }
+
