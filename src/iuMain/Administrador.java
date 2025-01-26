@@ -3259,6 +3259,233 @@ private static void ingresoZonaJuegos(Cliente ClienteActual) {
 		}
 	}while(!caso);
 	
+	//inicio proceso de generacion de bonos
+	Random random = new Random();
+	double puntuacion = 0;
+	if (game.equals("win")) {
+		puntuacion = Arkade.getPuntuacionMaxima();
+	}
+	else if (game.equals("defeat")) {
+		puntuacion = Math.round((random.nextDouble() * 10) * 100.0) / 100.0;
+	}
 	
+	System.out.println("•Tu puntuacion es: "+puntuacion);
+	
+	Bono bonoCliente = null;
+	String codigoBono = null;
+	
+	if (puntuacion==10.0) {
+		if (redimioCodigo) {
+			if (generoJuego.equals(generoCodigoPelicula)) {
+				System.out.println("\nGanas un bono de comida por obtener la puntuacion maxima en un juego de tipo "+generoJuego+" y redimir un codigo de pelicula del mismo genero");
+				barraCarga("Generando bono");
+				espera(3000);
+				bonoCliente = Bono.generarBonoComidaJuegos(ClienteActual.getCineActual(), ClienteActual);
+				
+				
+				if (!(bonoCliente == null)) {
+					bonoCliente.setCliente(ClienteActual);
+					codigoBono = bonoCliente.getCodigo();
+					ClienteActual.getCodigosBonos().add(codigoBono);
+					
+					
+					System.out.println("•Reclama el bono con el codigo en nuestro servicio de comida");
+				}
+				
+				else {
+					System.out.println("Error al asignar bono debido a que no hay productos de comida disponibles");
+				}
+			}
+			else {
+				System.out.println("\nGanas un bono de souvenirs por obtener la puntuacion maxima, !Felicidades¡");
+				barraCarga("Generando bono");
+				espera(3000);
+				bonoCliente = Bono.generarBonoSouvenirJuegos(ClienteActual.getCineActual(), ClienteActual);
+				
+				if (!(bonoCliente == null)) {
+					bonoCliente.setCliente(ClienteActual);
+					codigoBono = bonoCliente.getCodigo();
+					ClienteActual.getCodigosBonos().add(codigoBono);
+					
+					
+					System.out.println("•Reclama el bono con el codigo en nuestro servicio de souvenirs");
+				}
+				
+				else {
+					System.out.println("Error al asignar bono debido a que no hay productos de souvenir disponibles");
+				}
+
+			}
+		}
+		else {
+			System.out.println("\\nGanas un bono de souvenirs por obtener la puntuacion maxima, !Felicidades¡");
+			barraCarga("Generando bono");
+			espera(3000);
+			bonoCliente = Bono.generarBonoSouvenirJuegos(ClienteActual.getCineActual(),ClienteActual);
+			
+			if (!(bonoCliente == null)) {
+				bonoCliente.setCliente(ClienteActual);
+				codigoBono = bonoCliente.getCodigo();
+				ClienteActual.getCodigosBonos().add(codigoBono);
+
+				
+				
+				System.out.println("•Reclama el bono con el codigo en nuestro servicio de souvenirs");
+			}
+			
+			else {
+				System.out.println("Error al asignar bono debido a que no hay productos de souvenir disponibles");
+			}
+		}
+	}
+	
+
+	System.out.println("\n¡Gracias por jugar con nosotros!\n");
+	barraCarga("Redireccionando al menú principal");
+	Administrador.sc.nextLine();
+	Administrador.inicio(ClienteActual);
+	
+}
+	
+	
+//Fin de la funcionalidad
+	
+//---------------------------------------------------------------------------------------------------------------	
+	
+//Inicio de metodos auxiliares de la funcionalidad 4
+	
+/**
+ * Description : Este método se encarga de simular una barra de carga haciendo una serie de prints por pantalla
+ * @param word : Este método recibe como parámetro una palabra que se muestra en la barra de carga
+ * (De tipo String)
+ * @return <b>void</b> : No hay retorno
+ * */
+private static void barraCarga(String word) {
+	System.out.println("               "+word+"....");
+    
+    for (int i=0;i<42 ;i++ ) {
+    	try {
+            Thread.sleep(19);
+            System.out.print("|");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    System.out.println(" ");
+}
+
+
+/**
+ * Description : Este método se encarga de imprimir por pantalla la tarjetaCinemar del usuario, con su nombre y saldo correspondiente
+ * @param nombre : Este método recibe como parámetro el nombre del usuario
+ * (De tipo String)
+ * @param saldo : Este método recibe como parámetro el saldo de la tarjeta del usuario
+ * (De tipo double)
+ * @return <b>void</b> : No hay retorno
+ * */
+private static void imprimirTarjeta(String nombre, double saldo) {
+	System.out.println("\n        ╔══════════════════════════╗");
+    System.out.println("        ║      Tarjeta Cinemar     ║");
+    System.out.println("        ╠══════════════════════════╣");
+    String linea = "        ║ Dueño: "+nombre;
+    for (int i = linea.length();i<36; i++) {
+    	if (i ==35) {
+    		linea = linea+"║";
+    	}
+    	else {linea = linea+" ";} 
+    }
+    System.out.println(linea);
+    String line = "        ║ Saldo: $"+saldo;
+    for (int i = line.length();i<38; i++) {
+    	if (i ==35) {
+    		line = line+"║";
+    	}
+    	else {line = line+" ";} 
+    }
+    System.out.println(line);
+    System.out.println("        ╚══════════════════════════╝\n");
+}
+
+
+/**
+ * Description : Este método se encarga de retrasar determinado tiempo la ejecucion del programa mediante una espera
+ * @param time : Este método recibe como parámetro el numero de milisegundos a esperar
+ * (De tipo int)
+ * @return <b>void</b> : No hay retorno
+ * */
+private static void espera(int time) {
+	try {
+        Thread.sleep(time);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+}
+
+/**
+ * Description : Este método se encarga de ejecutar el juego de la funcionalidad 4, el cual es un HangMan en donde se escoje una palabra aleatoria del parametro
+ * @param PALABRAS : Este método recibe como parámetro una lista de la palabras con las que se jugara para adivinarlas
+ * (De tipo String)
+ * @return <b>boolean</b> : Este método retorna un boolean true or false dependiendo de si el usuario acertó palabra o no
+ * */
+private static String juego(String[] PALABRAS) {
+    String match = null;
+
+    sc.nextLine();
+    String palabraSecreta = PALABRAS[(int) (Math.random() * PALABRAS.length)];
+    char[] palabraAdivinada = new char[palabraSecreta.length()];
+    String letrasUsadas = ""; // Para rastrear letras ya usadas
+    int intentosRestantes = 7;
+
+    for (int i = 0; i < palabraAdivinada.length; i++) {
+        palabraAdivinada[i] = '_';
+    }
+
+    while (intentosRestantes > 0 && !adivinado(palabraAdivinada)) {
+        System.out.println("Intentos restantes: " + intentosRestantes);
+        System.out.print("Palabra: ");
+        for (char c : palabraAdivinada) {
+            System.out.print(c + " ");
+        }
+        System.out.println();
+
+        System.out.print("Ingresa una letra: ");
+        String input = sc.nextLine().toUpperCase();
+        if (input.length() != 1 || !esLetraValida(input.charAt(0))) {
+            System.out.println("Carácter inválido. Intenta otra vez.");
+            intentosRestantes--;
+            continue;
+        }
+
+        char letra = input.charAt(0);
+
+        // Verificar si la letra ya fue usada
+        if (letrasUsadas.contains(String.valueOf(letra))) {
+            System.out.println("Ya has usado esa letra. Intenta otra.");
+            continue;
+        }
+
+        letrasUsadas += letra;
+
+        if (palabraSecreta.indexOf(letra) >= 0) {
+            for (int i = 0; i < palabraSecreta.length(); i++) {
+                if (palabraSecreta.charAt(i) == letra) {
+                    palabraAdivinada[i] = letra;
+                }
+            }
+        } else {
+            System.out.println("¡Incorrecto! La letra '" + letra + "' no está en la palabra.");
+            intentosRestantes--;
+        }
+    }
+
+    if (adivinado(palabraAdivinada)) {
+        System.out.println("¡Felicidades! ¡Has adivinado la palabra!: " + palabraSecreta);
+        match = "win";
+    } else {
+        System.out.println("¡Oh no! Te has quedado sin intentos. La palabra era: " + palabraSecreta);
+        match = "defeat";
+    }
+    return match;
+}
 	
 	
