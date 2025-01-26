@@ -2847,4 +2847,226 @@ public class Administrador {
 				
 
 					}
-								
+
+//------------------------------------------------------------------------------------------------------------------		
+		
+	//BLOQUE PARA LA FUNCIONALIDAD 4
+	
+	
+	
+//  _____  _   _   _   _    _____   _    ____    _   _       __       _       _   _____       __       _____  	     ____
+// |  __| | | | | | \ | |  / ____| | |  / __ \  | \ | |     /  \     | |     | | |  __ \     /  \     |  __ \ 	    /    |
+// | |__  | | | | |  \| | | |	   | | | |  | | |  \| |    /    \    | |     | | | |  | |	/    \    | |  | |	   / /|  |
+// |  __| | | | | |	   \| | |      | | | |  | | |    \|   /  __  \   | |     | | | |  | |  /  __  \   | |  | |	  / /_|  |_
+// | |    | |_| | | |\	| | |____  | | | |__| | | |\  |  / ______ \  | |___  | | | |__| | / ______ \  | |__| |	 |___     _|
+// |_|     \___/  |_| \_|  \_____| |_|  \____/  |_| \_| /_/      \_\ |_____| |_| |_____/ /_/      \_\ |_____/ 	     |___|     
+	
+		
+		
+		
+/**
+ * Description : Este método se encarga de toda la gestion de la funcionalidad 4, que incluye adquisicion y recarga de la tarjeta cinemar, ingreso a zona de juegos, ejecucion de juegos, generacion de bonos, etc.
+ * @param clienteActual : Este método recibe como parámetro el cliente actual que esta ejecutando el programa
+ * (De tipo Cliente)
+ * @param sucursalCineProceso : Este método recibe como parámetro la sucursal de cine en la que se esta ejecutando el programa
+ * (De tipo SucursalCine)
+ * @return <b>void</b> : No hay retorno
+ * */
+private static void ingresoZonaJuegos(Cliente ClienteActual) {
+	
+	//ClienteActual.getCineActual().getBonosCreados().clear();
+	
+	//Se muestra el menu de opciones que el usurio desea realizar 
+	try {
+		System.out.println("\n-Recuerde que para entrar a los juegos es necesario tener la tarjeta cinemar-\nDesea:\n1.Ingresar\n2.Volver al menú principal\n3.Salir y Guardar");
+		int opcion = (int)Administrador.readLong();
+		if (opcion==2) {barraCarga("Volviendo");Administrador.sc.nextLine();Administrador.inicio(ClienteActual);}//volver
+		else if (opcion==1) {barraCarga("Ingresando");}//ingresar
+		else if (opcion==3) {barraCarga("Saliendo");Administrador.salirDelSistema();}//salir
+		else {System.out.println("\nOpcion Invalida");ingresoZonaJuegos(ClienteActual);}	
+	
+	}catch(InputMismatchException e) {
+		System.out.println("-Error, debe ingresar un único dato numérico entre los disponibles-");
+		Administrador.sc.nextLine(); 
+		ingresoZonaJuegos(ClienteActual);
+	}
+
+	boolean casoValido = true;
+	
+	do {
+		if (!ClienteActual.verificarCuenta()) {
+			try {
+				System.out.println("\nNo tienes una Tarjeta Cinemar asociada, ¿Deseas Adquirirla? \n1. SI\n2. NO");
+				espera(1000);
+				int option = (int)Administrador.readLong();
+				if (option==1) {
+					if (Arkade.verificarTarjetasEnInventario(ClienteActual.getCineActual())) { // se verifica si hay tarjetas disponibles por vender en el array
+						barraCarga("Adquiriendo tarjeta");
+						System.out.println("\nEl precio de la tarjeta Cinemar es de $5000\nEste valor sera descontado al saldo de su tarjeta");
+						espera(2000);
+						//
+						//Aca se asocia la primera tarjeta en el array de disponibles al cliente, se le descuenta el valor de la tarjeta y se imprime por pantalla
+						Arkade.asociarTarjetaCliente(ClienteActual);
+						ClienteActual.getCuenta().hacerPago(5000);
+						System.out.println("\nSu tarjeta :");
+						espera(1000);
+						imprimirTarjeta(ClienteActual.getCuenta().getDueno().getNombre(),ClienteActual.getCuenta().getSaldo());
+						casoValido = false;
+						//
+					}
+					else {System.out.println("\nLo sentimos, en este momento no hay tarjetas disponibles, vuelva mas tarde");Administrador.sc.nextLine(); Administrador.inicio(ClienteActual);}
+				
+				}
+				else if (option ==2) {ingresoZonaJuegos(ClienteActual);}
+				else {System.out.println("\nOpcion Invalida");}
+			}catch(InputMismatchException e) {
+				System.out.println("-Error, debe ingresar un único dato numérico entre los disponibles-");
+				Administrador.sc.nextLine();
+			}
+		}
+		else {
+			System.out.println("\nSu tarjeta:");
+			espera(1000);
+			imprimirTarjeta(ClienteActual.getCuenta().getDueno().getNombre(),ClienteActual.getCuenta().getSaldo());
+			casoValido = false;
+		}
+	}while(casoValido);
+					
+	
+	int eleccion1 = 0;
+	boolean finCiclo = true;
+	
+	boolean Vcase = true;
+	do {
+		do {
+			
+			try {
+				System.out.println("¿Deseas recargar la tarjeta?");
+				System.out.println("1. SI\n2. NO\n3. Volver al menú principal\n4. Salir y Guardar");
+				eleccion1 = (int)Administrador.readLong();
+				if (eleccion1==1 || eleccion1==2 || eleccion1==3 || eleccion1==4) {
+					casoValido = false;
+				}
+				else {
+					System.out.println("Opcion Invalida");
+					casoValido = true;
+				}
+
+			}catch(InputMismatchException e) {
+				System.out.println("\n-Error, debe ingresar un único dato numérico entre los disponibles-, vuelva a realizar el proceso");
+				Administrador.sc.nextLine();
+				casoValido = true;
+			}
+		}while(casoValido);
+
+		
+		//Inicio proceso de pago
+		double recargaMaxima = 0;
+		double valorRecarga = 0;
+		
+		for (MetodoPago metodo : ClienteActual.getMetodosDePago()) {
+			recargaMaxima+= metodo.getLimiteMaximoPago();
+		}
+	
+	
+	
+		if(eleccion1 == 1) {
+			do {
+				try {
+					
+						
+						valorRecarga = 0;
+						
+						System.out.println("El valor maximo a recargar por proceso es: $"+recargaMaxima+" intente no superar este valor");
+						System.out.print("Digite el valor a recargar: ");
+						valorRecarga = Administrador.readLong();
+						
+						if (!(valorRecarga<= recargaMaxima & valorRecarga>0)) {
+							System.out.println("\n•El valor ingresado supera el limite maximo de recarga ");
+						}
+						
+					
+				}catch(InputMismatchException e) {
+					System.out.println("\n-Error, debe ingresar un único dato numérico entre los disponibles-, vuelva a realizar el proceso");
+					Administrador.sc.nextLine();
+					casoValido = true;
+				}
+			}while(!(valorRecarga<= recargaMaxima & valorRecarga>0)); 
+		
+			casoValido = true;
+			int opcionPago = 0;
+			double precioRecargaProceso = valorRecarga;
+			double totalPagado = 0;
+			do {
+				do {
+					try {
+						System.out.println("\nEscoja su metodo de pago");
+						System.out.println("Cada metodo de pago tiene un monto maximo para recargar y un descuento asociado, en caso de superar este monto debera elegir otro metodo de pago para completar la recarga");
+						System.out.println(MetodoPago.mostrarMetodosDePago(ClienteActual));
+						opcionPago = (int)Administrador.readLong();
+						
+						if(!(opcionPago > 0 & opcionPago <= ClienteActual.getMetodosDePago().size() )) {
+							System.out.println("Opcion Invalida");
+						}
+					}catch(InputMismatchException e) {
+						System.out.println("\n-Error, debe ingresar un único dato numérico entre los disponibles-, vuelva a realizar el proceso");
+						Administrador.sc.nextLine();
+						casoValido = true;
+						opcionPago = 0;
+					}
+				}while(!(opcionPago > 0 & opcionPago <= ClienteActual.getMetodosDePago().size() ));
+				
+				MetodoPago metodoPagoProceso = null;
+				metodoPagoProceso = ClienteActual.getMetodosDePago().get(opcionPago - 1);
+				
+				
+				
+				System.out.println("El método de pago escogido es: " + metodoPagoProceso.getNombre() 
+				+ " ( Precio anterior: " + precioRecargaProceso+ " -> Precio actual: " + precioRecargaProceso * (1 - metodoPagoProceso.getDescuentoAsociado()) + " )");
+	
+				espera(2000);
+				
+				//Realizamos lógica de pago 
+				//En caso de que el método de pago seleccionado cumpla con el pago, le sumamos al total pagado el precio de recarga actual luego de aplicarle el descuento, en caso de que no le sumamos el pago realizado
+				totalPagado += (precioRecargaProceso * (1 - metodoPagoProceso.getDescuentoAsociado()) - metodoPagoProceso.getLimiteMaximoPago() <= 0) ? precioRecargaProceso * (1 - metodoPagoProceso.getDescuentoAsociado()) : metodoPagoProceso.getLimiteMaximoPago(); 
+				precioRecargaProceso = metodoPagoProceso.realizarPago(precioRecargaProceso, ClienteActual); //Realizamos el proceso de pago a partir del método de pago
+				
+				if( precioRecargaProceso == 0) {
+					
+					barraCarga("Procesando pago");
+					System.out.println("Pago exitoso, se han recargado "+ valorRecarga+" y usted ha pagado "+ totalPagado+" equivalente a un descuento de "+ String.format("%.2f",(100-((totalPagado*100)/valorRecarga)))+ "%");
+					MetodoPago.asignarMetodosDePago(ClienteActual);
+					ClienteActual.getCuenta().ingresarSaldo(valorRecarga);
+					System.out.println("\nSu tarjeta :");
+					imprimirTarjeta(ClienteActual.getNombre(), ClienteActual.getCuenta().getSaldo());
+					totalPagado =0;
+					int eleccionUser = 0;
+					do {
+						try {
+							eleccionUser = 0;
+							System.out.println("\nDesea: \n1. Ingresar a los juegos\n2. Volver a recargar tarjeta\n3. Volver al inicio\n4. Salir y Guardar");
+							eleccionUser = (int)Administrador.readLong();
+							switch(eleccionUser) {
+							case 1: barraCarga("Ingresando");casoValido = false; Vcase = false; break;
+							case 2: barraCarga("Redirigiendo"); casoValido = false; Vcase = true ; break;
+							case 3: barraCarga("Volviendo"); Administrador.inicio(ClienteActual); break;
+							case 4: barraCarga("Saliendo"); Administrador.salirDelSistema(); break;
+							}
+						}catch(InputMismatchException e) {
+							System.out.println("\n-Error, debe ingresar un único dato numérico entre los disponibles-, vuelva a realizar el proceso");
+							Administrador.sc.nextLine();
+							eleccionUser = 0;
+						}
+					}while(eleccionUser !=1 & eleccionUser !=2 & eleccionUser !=3 & eleccionUser !=4);
+					
+				}
+				else {
+					espera(1000);
+					barraCarga("Procesando Pago");
+					
+					System.out.println("Proceso exitoso, sin embargo, tiene un saldo pendiente por recargar de : " + precioRecargaProceso);
+					System.out.println("Nota: si no culmina con el pago completo, no se recargara nada a la tarjeta.");
+					casoValido = true;
+				}
+			}while(casoValido);
+		}
