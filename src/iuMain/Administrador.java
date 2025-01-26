@@ -2680,4 +2680,171 @@ public class Administrador {
 								/**Description: En esta parte del codigo, en modo de agradecimiento con el cliente por haber hecho la respectiva calificacion de 
 								 * comida o de peliculas le ofrecemos un combo a un precio muy especial, y ya, esta a opcion del cliente si quiere adquirir este
 								 * combo especial o no
-								 */	
+								 */
+								System.out.print("\nComo calificaste una pelicula te queremos hacer la oferta de un combo especial, deseas verlo?\n1.Si\n2.No : ");
+								eleccion1 = Integer.parseInt(sc.nextLine());
+								if (eleccion1==1) {
+									
+									Pelicula peliculaCombo=clienteProceso.getCineActual().mejorPelicula();
+									LocalDateTime opcionHorarioPelicula=peliculaCombo.seleccionarHorarioMasLejano();
+									String numAsientoProceso= peliculaCombo.seleccionarAsientoAleatorio(opcionHorarioPelicula);
+									Producto productoCombo1=clienteProceso.getCineActual().peorProducto();
+									String codigoBono=productoCombo1.generarCodigoAleatorio(5);
+									/**Description: En esta parte del codigo, se le ofrece al cliente el combo especial, este combo especial en este caso, tiene la 
+									 * mejor pelicula con el peor producto, esto lo hacemos con el fin de logica de negocio, y podamos tener mejores resultados con 
+									 * los productos y peliculas.
+									 */
+									System.out.println("Estos son los productos escogidos para darte el combo especial: " + "La pelicula " +
+											peliculaCombo.getNombre() + " en formato " + peliculaCombo.getTipoDeFormato() + "\nen el horario " + opcionHorarioPelicula + " en el asiento " + numAsientoProceso 
+											+"\ny el producto " + productoCombo1.getNombre() + " " + productoCombo1.getTamaño());
+									
+									double precioTotal=0;
+									precioTotal=peliculaCombo.getPrecio()+productoCombo1.getPrecio();
+									System.out.println("Este combo tiene un precio de: " + precioTotal + ",deseas adquirirlo? \n1.Si\n2.No:  ");
+									eleccion2 = Integer.parseInt(sc.nextLine());
+									if(eleccion2==1) {
+										//Iniciamos el proceso de pago
+										System.out.println("\n		Proceso de pago");
+										System.out.println("=====================================================");
+										
+										boolean pagoRealizado = false;
+										boolean casoValido = false;
+										boolean casoValidoConfirmacion = false;
+										
+										MetodoPago metodoPagoProceso = null;
+										double precioComboProceso = productoCombo1.getPrecio()+peliculaCombo.getPrecio();
+										double precioAcumuladoComboProceso = 0;
+										int opcionMenu=0;
+										//Selccionar el método de pago para realizar el pago y realizar el pago
+										do {
+											do {
+												opcionMenu = 0;
+												try {
+													System.out.println("\nEl valor a pagar por el combo es: " + precioComboProceso
+													+ "\nEste es el listado de los métodos de pago disponibles:\n" 
+													+ MetodoPago.mostrarMetodosDePago(clienteProceso));
+													System.out.print("\nElige una de las opciones disponibles para realizar el pago: " );
+													opcionMenu = Integer.parseInt(sc.nextLine());
+												}catch(NumberFormatException e) {
+													System.out.println("\nError, debe ingresar un único dato númerico entre los disponibles");
+												}
+												
+												if (opcionMenu > 0 & opcionMenu <= clienteProceso.getMetodosDePago().size()) {
+													//Se selecciona el método de pago
+													metodoPagoProceso = clienteProceso.getMetodosDePago().get(opcionMenu - 1);
+													casoValido = true;
+													
+												}else {
+													
+													System.out.println("\nSeleccione un método de pago entre los disponibles");
+													
+												}
+											}while( !casoValido );
+											
+											do {
+												opcionMenu = 0;
+												try {
+													System.out.println("\nEl método de pago escogido es: " + metodoPagoProceso.getNombre() 
+													+ " ( Precio anterior: " + precioComboProceso + " -> Precio actual: " + precioComboProceso * (1 - metodoPagoProceso.getDescuentoAsociado()) + " )"
+													+ "\n1. Correcto\n2. Cambiar Método de pago");
+													opcionMenu = Integer.parseInt(sc.nextLine());
+												}catch(NumberFormatException e) {
+													System.out.println("Error, debes ingresar un único dato numérico entre los disponibles");
+												}
+												
+												switch(opcionMenu) {
+												case 1: casoValidoConfirmacion = true; break;
+												case 2: casoValidoConfirmacion = true; break;
+												default: System.out.println("Opcion Invalida"); casoValidoConfirmacion = false;
+												}
+												
+											}while(!casoValidoConfirmacion);
+											
+											if (opcionMenu == 2 || opcionMenu == 0) {
+												continue;
+											}
+											
+											
+											
+											//Realizamos el pago y sumamos el precio acumulado para mostrar el valor real del ticket
+											precioAcumuladoComboProceso = precioAcumuladoComboProceso + precioComboProceso * (1 - metodoPagoProceso.getDescuentoAsociado());
+											precioComboProceso = metodoPagoProceso.realizarPago(precioComboProceso, clienteProceso);
+											
+											//Ponemos un delay en pantalla
+											System.out.println("\nEstamos procesando su pago, por favor espere...\n");
+											try {
+												Thread.sleep(3000);
+											}catch(InterruptedException e) {
+												e.printStackTrace();
+											}
+										
+											//Realizamos el pago, según si el cliente decidió comprar un asiento de una película en presentación o en otro horario distinto
+											
+												
+												//Verificamos si el pago fue cubierto en su totalidad
+												if (precioComboProceso == 0) {
+													
+													System.out.println("\nPago realizado, La compra de su ticket fue exitosa\n");
+													
+													//Setteamos el precio del ticket
+													Ticket ticketProceso=new Ticket(peliculaCombo,opcionHorarioPelicula,numAsientoProceso,clienteProceso.getCineActual());
+													new Bono(codigoBono,new Producto(productoCombo1.getNombre(),productoCombo1.getTamaño(),1),productoCombo1.getTipoProducto(),clienteProceso);
+													//Realizamos el proceso correspondiente luego de ser verificado
+													ticketProceso.procesarPagoRealizado(clienteProceso);
+													int filaProceso = Character.getNumericValue(numAsientoProceso.charAt(0));
+													int columnaProceso = Character.getNumericValue(numAsientoProceso.charAt(2));
+													peliculaCombo.modificarSalaVirtual(opcionHorarioPelicula, filaProceso, columnaProceso);
+													
+													System.out.println("-----------------------Factura--------------------------");
+													System.out.println("------------------Este es tu combo!!---------------------");
+													System.out.println(peliculaCombo.getNombre()+ " y " + productoCombo1.getNombre()+ productoCombo1.getTamaño());
+													System.out.println("------Felicidades, gracias por confiar en nosotros----");
+													System.out.println("\n");
+													pagoRealizado = true;
+												}else {
+													
+													//Repetimos el proceso hasta validar el pago
+													System.out.println("Tiene un saldo pendiente de : " + precioComboProceso);
+													
+												}
+												
+											
+										
+										}while(!pagoRealizado);
+									}
+											
+								
+								else {
+									System.out.println("Gracias por tu tiempo... Adios ");
+									Administrador.inicio(clienteProceso);
+								}
+							}
+							
+							}catch(NumberFormatException e) {
+								System.out.println("\nError, debes ingresar un dato numérico\n");
+								continue;
+							}
+							
+							
+						}while(verificar);
+						}
+					else {
+						System.out.println("******Lastimosamente no has visto ninguna pelicula, por lo tanto no puedes calificar ninguna*******");
+					}
+						
+				}
+				
+		        //Si la eleccion es 3, se devuelve al menu principal
+				
+				else if (eleccion==3) {
+					Administrador.inicio(clienteProceso);
+					verificar=true;
+						
+			     }
+				else {
+					calificacion(clienteProceso);
+				}
+				
+
+					}
+								
