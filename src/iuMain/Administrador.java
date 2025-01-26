@@ -2263,3 +2263,244 @@ public class Administrador {
 			}
 			
 		}while(verificacionR);
+		println("\n----------------------------------------------------------------------------------");
+				System.out.println("\n         Gracias por utilizar: "+ metodoDePago.getNombre() +" para hacer tu pago");
+				valor = serviciProceso.getValorPedido() * (1 - metodoDePago.getDescuentoAsociado());
+				System.out.println("          Ahora el valor a pagar es de: $"+valor+"\n");
+				
+				
+				if (condicion) {
+					condicion = false;
+					valor = serviciProceso.getValorPedido() * (1 - metodoDePago.getDescuentoAsociado());
+				//Aqui se hace la ligadura dinamica
+					if (serviciProceso.descuentarPorCompra(metodoDePago)) {
+						System.out.print("        ------------------------------------------------------------------- \n");
+						System.out.print("       |       Felicidades obtuviste un descuento sorpresa en tu compra    |\n");
+						System.out.print("        ------------------------------------------------------------------- \n");
+						valor = serviciPr//////////////////////////////////////   Proceso de pago y descuento por valor de compras   ///////////////////////////////////////////
+		
+		serviciProceso.setValorPedido(serviciProceso.calcularTotal());
+		
+		if (serviciProceso.getValorPedido()>0) {
+			
+			double valor = 0;
+			double valor1 = 0;
+			double descuento = 0;
+			verificacion = true;
+			boolean condicion = true;
+			System.out.print("\n------EL PEDIDO ESTA LISTO SOLO FALTA PAGAR: $"+serviciProceso.getValorPedido()+" ------\n");
+			do {
+				try {
+					
+					System.out.println("\nMETODOS DE PAGO DISPONIBLES:\n");
+					System.out.println(MetodoPago.mostrarMetodosDePago(clienteProceso));
+					System.out.print("Seleccione una opcion: ");
+					eleccion = Integer.parseInt(sc.nextLine());
+					
+				}catch(NumberFormatException e) {
+					System.out.println("\nError, debes ingresar un dato numérico\n");
+					continue;
+				}
+				
+				MetodoPago metodoDePago = MetodoPago.usarMetodopago(clienteProceso, eleccion);
+				System.out.oceso.getValorPedido() * (1 - metodoDePago.getDescuentoAsociado());
+						System.out.println("       Ahora tu cuenta quedo en: $" + valor);
+					}
+					valor1 = serviciProceso.getValorPedido();
+				}
+				descuento = descuento + (serviciProceso.getValorPedido() * metodoDePago.getDescuentoAsociado());
+				serviciProceso.setValorPedido(metodoDePago.realizarPago(serviciProceso.getValorPedido(),clienteProceso));
+				
+				
+				if (serviciProceso.getValorPedido() == 0) {
+					valor1 = valor1 - descuento;
+					serviciProceso.setValorPedido(valor1);
+					System.out.println("LA CUOTA FUE CUBIERTA EN SU TOTALIDAD");
+					System.out.println("\nEstamos generando su factura, por favor espere...\n");
+					try {
+						Thread.sleep(3000);
+					}catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+					System.out.print(serviciProceso.factura());
+					System.out.print("\n\n          Redireccionando al menu principal\n\n");
+					try {
+						Thread.sleep(3000);
+					}catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+					serviciProceso.procesarPagoRealizado(clienteProceso);
+					verificacion = false;
+				}
+				else {
+					System.out.println("\n----------------------------------------------------------------------------------");
+					System.out.println("\nFALTA POR TERMINAR DE PAGAR : $" + serviciProceso.getValorPedido() + " (T_T)(T_T)(T_T)");
+					continue;
+				}
+				
+			}while(verificacion);
+			
+		}
+		
+		else {
+			
+			System.out.println("\n ******************** Redireccionando al menu principal ******************** \n");
+			
+			try {
+				Thread.sleep(3000);
+			}catch(InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	
+		
+//******************************************************************************************************************************************	   
+	
+	//Bloque funcionalidad 3
+	
+	// _____  _   _   _   _    _____   _    ____    _   _       __       _       _   _____       __       _____  	   ________
+	//|  __| | | | | | \ | |  / ____| | |  / __ \  | \ | |     /  \     | |     | | |  __ \     /  \     |  __ \ 	  |___    /
+	//| |__  | | | | |  \| | | |	  | | | |  | | |  \| |    /    \    | |     | | | |  | |   /    \    | |  | |	     /   /
+	//|  __| | | | | |	  \| | |      | | | |  | | |    \|   /  __  \   | |     | | | |  | |  /  __  \   | |  | |	    |    \
+	//| |    | |_| | | |\  | | \____  | | | |__| | | |\  |  / ______ \  | |___  | | | |__| | / ______ \  | |__| |      __\	  \        
+	//|_|     \___/  |_| \_|  \_____| |_|  \____/  |_| \_| /_/      \_\ |_____| |_| |_____/ /_/      \_\ |_____/ 	  |_______|
+	
+	private static void calificacion(Cliente clienteProceso) {
+		
+		
+			
+				boolean verificar = true;
+				int eleccion = 0;
+				int eleccion1=0;
+				int eleccion2=0;
+				
+				/** Description: Esta funcionalidad 3 se va a encargar de hacer la respectiva calificacion de peliculas y productos dependiendo
+				 * de los gustos del cliente, ya que con estas calificaciones vamos a hacer un proceso interno de logica de negocio 
+				 * dentro del cine, para poder saber que peliculas o productos estan funcionando bien o por consecuencia, cuales 
+				 * estan funcionando mal
+				*/
+				//Le damos la bienvenida al cliente
+				System.out.println("********Bienvenido a la calificacion de productos*********");
+				
+				/** Description: Este ciclo es para preguntarle al cliente que es lo que desea hacer dentro de la funcionalidad, si calificar
+				 * una pelicula, un producto o volver al menu principal
+				 */
+				do {
+					try {
+						System.out.print("\n1.Calificar Comida.\n2.Calificar Pelicula\n3.Volver al menu.\nSeleccione una opcion: ");
+						eleccion = Integer.parseInt(sc.nextLine());
+					}catch(NumberFormatException e) {
+						System.out.println("\nError, debes ingresar un dato numérico\n");
+						continue;
+					}
+					if (eleccion == 3) {
+						Administrador.inicio(clienteProceso);
+						break;
+					}
+					else if (eleccion == 1 || eleccion == 2) {
+						verificar = false;
+					}
+				}while(verificar);
+				/**Description: En esta parte hacemos un condicional dependiendo dla opcion que el cliente escoja, si el cliente escoje
+				 * la eleccion uno se le da la bienvenida para la calificacion de comidas y por el contrario si la eleccion es dos,
+				 * se le da la bienvenida al apartado de calificacion de peliculas.
+				 * Metodo mostrarHsitorialDePedidos: Este metodo le muestra a los usuarios los pedidos que han hecho, y por ende tambien verifica
+				 * si el cliente si ha hecho almenos una compra, esto es para evitar que un cliente pueda calificar un producto que no ha 
+				 * consumido. Cuando se verifica que el cliente ha consumido un producto se le da a escojer que producto desea calificar,
+				 * y el cliente le da una valoracion del 1 al 5 dependiendo de los gustos del usuario.
+				 *  
+				 */
+				if (eleccion==1) {
+					System.out.println("\n********Bienvenido al apartado de calificacion de comida********");
+					if(clienteProceso.getProductosDisponiblesParaCalificar().size() > 0) {
+						System.out.println("\n********Estos son los pedidos que has adquirido**********" + "\n" + clienteProceso.mostrarProductosParaCalificar());
+						Producto opcionPedido=null;
+						int calificacion1=0;
+						do {
+							try {
+								System.out.print("\n*********Seleccione el producto que deseas calificar********");
+								eleccion = Integer.parseInt(sc.nextLine());
+								if (eleccion == 0) {
+									break;
+								}
+								if (eleccion > clienteProceso.getProductosDisponiblesParaCalificar().size() || eleccion < 1) {
+									System.out.print("\n******Error en la seleccion del producto******");
+									continue;
+								}
+								opcionPedido = clienteProceso.getProductosDisponiblesParaCalificar().get(eleccion-1);
+								System.out.print("\nIngrese la calificacion del 1 al 5 que le vas a dar a este producto: ");
+								calificacion1 = Integer.parseInt(sc.nextLine());
+								if (calificacion1>=3) {
+									System.out.println("\n*********Escogiste: " + opcionPedido.getNombre() + " " + opcionPedido.getTamaño() + "  y le diste una valoracion de " + calificacion1 + " por lo tanto esta comida esta catalogada como bien calificada" + "***********");
+									
+								}
+								
+								else if(calificacion1<=2.99) {
+									System.out.println("\n*********Escogiste: " + opcionPedido.getNombre() + " " + opcionPedido.getTamaño() + "  y le diste una valoracion de " + calificacion1 + " por lo tanto esta comida esta catalogada como mal calificada" + "***********");
+									
+									}
+								else {
+									System.out.println("Error al calificar la comida, recuerda que es del 1 al 5");
+								}
+								
+								//Eliminamos el producto de los productos disponibles para calificar
+								clienteProceso.getProductosDisponiblesParaCalificar().remove(opcionPedido);
+								
+								Producto prueba = opcionPedido;
+								//En este apartado setteamos las nuevas valoraciones hechas por el cliente y tambien aumentamos el numero de valoraciones realizadas
+								
+								double calificacionGlobalPedidos;
+								calificacionGlobalPedidos= (prueba.getValoracionComida() * prueba.getTotalEncuestasDeValoracionRealizadasComida()+calificacion1)/(prueba.getTotalEncuestasDeValoracionRealizadasComida()+1);
+								prueba.setTotalEncuestasDeValoracionRealizadasComida(prueba.getTotalEncuestasDeValoracionRealizadasComida()+1);
+								prueba.setValoracionComida(calificacionGlobalPedidos);
+								
+								if (!prueba.verificarInventarioProducto(clienteProceso.getCineActual())== true ) {
+									continue;
+								}
+								
+								else {
+									System.out.println("De esta comida todavia hay unidades en inventario");
+								}
+								
+								/**Description: En esta parte del codigo, en modo de agradecimiento con el cliente por haber hecho la respectiva calificacion de 
+								 * comida o de peliculas le ofrecemos un combo a un precio muy especial, y ya, esta a opcion del cliente si quiere adquirir este
+								 * combo especial o no
+								 */
+									System.out.println("\nComo calificaste un producto te queremos hacer la oferta de un combo especial, deseas verlo?\n1.Si\n2.No");
+									eleccion1 = Integer.parseInt(sc.nextLine());
+									if (eleccion1==1) {
+										Pelicula peliculaCombo=clienteProceso.getCineActual().peorPelicula();
+										LocalDateTime opcionHorarioPelicula=peliculaCombo.seleccionarHorarioMasLejano();
+										String numAsientoProceso= peliculaCombo.seleccionarAsientoAleatorio(opcionHorarioPelicula);
+										Producto productoCombo1=clienteProceso.getCineActual().mejorProducto();
+										String codigoBono=productoCombo1.generarCodigoAleatorio(7);
+										/**Description: En esta parte del codigo, se le ofrece al cliente el combo especial, este combo especial en este caso, tiene la 
+										 * mejor pelicula con el peor producto, esto lo hacemos con el fin de logica de negocio, y podamos tener mejores resultados con 
+										 * los productos y peliculas.
+										 */
+										System.out.println("Estos son los productos escogidos para darte el combo especial: " + "La pelicula " +
+										peliculaCombo.getNombre() + " en formato " + peliculaCombo.getTipoDeFormato() + "\nen el horario " + opcionHorarioPelicula + " en el asiento " + numAsientoProceso 
+										+"\ny el producto " + productoCombo1.getNombre() + " " + productoCombo1.getTamaño());
+										
+										double precioTotal=0;
+										precioTotal=peliculaCombo.getPrecio()+productoCombo1.getPrecio();
+										System.out.println("Este combo tiene un precio de: " + precioTotal + ",deseas adquirirlo? \n1.Si\n2.No");
+										eleccion2 = Integer.parseInt(sc.nextLine());
+										if(eleccion2==1) {
+											//Iniciamos el proceso de pago
+											System.out.println("\n		Proceso de pago");
+											System.out.println("=====================================================");
+											
+											boolean pagoRealizado = false;
+											boolean casoValido = false;
+											boolean casoValidoConfirmacion = false;
+											
+											MetodoPago metodoPagoProceso = null;
+											double precioComboProceso = productoCombo1.getPrecio()+peliculaCombo.getPrecio();
+											double precioAcumuladoComboProceso = 0;
+											int opcionMenu=0;
+
+
