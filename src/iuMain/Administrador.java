@@ -1080,7 +1080,7 @@ public class Administrador {
 				if ( realizarReservaDePeliculaEnPresentacion ) {
 					
 					//Verificamos si el pago fue cubierto en su totalidad
-					if (precioTicketProceso == 0) {
+					if (IBuyable.verificarPago(precioTicketProceso)) {
 						
 						System.out.println("Pago realizado, La compra de su ticket fue exitosa\n");
 						
@@ -1115,7 +1115,7 @@ public class Administrador {
 				}else {
 					
 					//Verificamos si el pago fue cubierto en su totalidad
-					if (precioTicketProceso == 0) {
+					if (IBuyable.verificarPago(precioTicketProceso)) {
 						
 						System.out.println("Pago realizado, La compra de su ticket fue exitosa\n");
 						
@@ -2312,7 +2312,7 @@ public class Administrador {
 				serviciProceso.setValorPedido(metodoDePago.realizarPago(serviciProceso.getValorPedido(),clienteProceso));
 				
 				
-				if (serviciProceso.getValorPedido() == 0) {
+				if (IBuyable.verificarPago(serviciProceso.getValorPedido())) {
 					valor1 = valor1 - descuento;
 					serviciProceso.setValorPedido(valor1);
 					System.out.println("LA CUOTA FUE CUBIERTA EN SU TOTALIDAD");
@@ -2567,7 +2567,7 @@ public class Administrador {
 												
 													
 													//Verificamos si el pago fue cubierto en su totalidad
-													if (precioComboProceso == 0) {
+													if (IBuyable.verificarPago(precioComboProceso)) {
 														
 														System.out.println("\nPago realizado, La compra de su ticket fue exitosa\n");
 														
@@ -2782,7 +2782,7 @@ public class Administrador {
 											
 												
 												//Verificamos si el pago fue cubierto en su totalidad
-												if (precioComboProceso == 0) {
+												if (IBuyable.verificarPago(precioComboProceso)) {
 													
 													System.out.println("\nPago realizado, La compra de su ticket fue exitosa\n");
 													
