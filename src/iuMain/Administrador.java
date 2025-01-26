@@ -2502,5 +2502,56 @@ public class Administrador {
 											double precioComboProceso = productoCombo1.getPrecio()+peliculaCombo.getPrecio();
 											double precioAcumuladoComboProceso = 0;
 											int opcionMenu=0;
+											//Selccionar el método de pago para realizar el pago y realizar el pago
+											do {
+												do {
+													opcionMenu = 0;
+													try {
+														System.out.println("\nEl valor a pagar por el combo es: " + precioComboProceso
+														+ "\nEste es el listado de los métodos de pago disponibles:\n" 
+														+ MetodoPago.mostrarMetodosDePago(clienteProceso));
+														System.out.print("\nElige una de las opciones disponibles para realizar el pago: " );
+														opcionMenu = Integer.parseInt(sc.nextLine());
+													}catch(NumberFormatException e) {
+														System.out.println("\nError, debe ingresar un único dato númerico entre los disponibles");
+													}
+													
+													if (opcionMenu > 0 & opcionMenu <= clienteProceso.getMetodosDePago().size()) {
+														//Se selecciona el método de pago
+														metodoPagoProceso = clienteProceso.getMetodosDePago().get(opcionMenu - 1);
+														casoValido = true;
+														
+													}else {
+														
+														System.out.println("\nSeleccione un método de pago entre los disponibles");
+														
+													}
+												}while( !casoValido );
+												
+												do {
+													opcionMenu = 0;
+													try {
+														System.out.println("\nEl método de pago escogido es: " + metodoPagoProceso.getNombre() 
+														+ " ( Precio anterior: " + precioComboProceso + " -> Precio actual: " + precioComboProceso * (1 - metodoPagoProceso.getDescuentoAsociado()) + " )"
+														+ "\n1. Correcto\n2. Cambiar Método de pago");
+														opcionMenu = Integer.parseInt(sc.nextLine());
+													}catch(NumberFormatException e) {
+														System.out.println("Error, debes ingresar un único dato numérico entre los disponibles");
+													}
+													
+													switch(opcionMenu) {
+													case 1: casoValidoConfirmacion = true; break;
+													case 2: casoValidoConfirmacion = true; break;
+													default: System.out.println("Opcion Invalida"); casoValidoConfirmacion = false;
+													}
+													
+												}while(!casoValidoConfirmacion);
+												
+												if (opcionMenu == 2 || opcionMenu == 0) {
+													continue;
+												}
+
+
+												
 
 
