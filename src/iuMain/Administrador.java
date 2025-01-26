@@ -2263,21 +2263,7 @@ public class Administrador {
 			}
 			
 		}while(verificacionR);
-		println("\n----------------------------------------------------------------------------------");
-				System.out.println("\n         Gracias por utilizar: "+ metodoDePago.getNombre() +" para hacer tu pago");
-				valor = serviciProceso.getValorPedido() * (1 - metodoDePago.getDescuentoAsociado());
-				System.out.println("          Ahora el valor a pagar es de: $"+valor+"\n");
-				
-				
-				if (condicion) {
-					condicion = false;
-					valor = serviciProceso.getValorPedido() * (1 - metodoDePago.getDescuentoAsociado());
-				//Aqui se hace la ligadura dinamica
-					if (serviciProceso.descuentarPorCompra(metodoDePago)) {
-						System.out.print("        ------------------------------------------------------------------- \n");
-						System.out.print("       |       Felicidades obtuviste un descuento sorpresa en tu compra    |\n");
-						System.out.print("        ------------------------------------------------------------------- \n");
-						valor = serviciPr//////////////////////////////////////   Proceso de pago y descuento por valor de compras   ///////////////////////////////////////////
+		//////////////////////////////////////   Proceso de pago y descuento por valor de compras   ///////////////////////////////////////////
 		
 		serviciProceso.setValorPedido(serviciProceso.calcularTotal());
 		
@@ -2301,9 +2287,23 @@ public class Administrador {
 					System.out.println("\nError, debes ingresar un dato numérico\n");
 					continue;
 				}
-				
+
 				MetodoPago metodoDePago = MetodoPago.usarMetodopago(clienteProceso, eleccion);
-				System.out.oceso.getValorPedido() * (1 - metodoDePago.getDescuentoAsociado());
+				System.out.println("\n----------------------------------------------------------------------------------");
+				System.out.println("\n         Gracias por utilizar: "+ metodoDePago.getNombre() +" para hacer tu pago");
+				valor = serviciProceso.getValorPedido() * (1 - metodoDePago.getDescuentoAsociado());
+				System.out.println("          Ahora el valor a pagar es de: $"+valor+"\n");
+
+
+				if (condicion) {
+					condicion = false;
+					valor = serviciProceso.getValorPedido() * (1 - metodoDePago.getDescuentoAsociado());
+					//Aqui se hace la ligadura dinamica
+					if (serviciProceso.descuentarPorCompra(metodoDePago)) {
+						System.out.print("        ------------------------------------------------------------------- \n");
+						System.out.print("       |       Felicidades obtuviste un descuento sorpresa en tu compra    |\n");
+						System.out.print("        ------------------------------------------------------------------- \n");
+						valor = serviciProceso.getValorPedido() * (1 - metodoDePago.getDescuentoAsociado());
 						System.out.println("       Ahora tu cuenta quedo en: $" + valor);
 					}
 					valor1 = serviciProceso.getValorPedido();
