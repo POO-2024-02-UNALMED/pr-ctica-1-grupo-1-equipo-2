@@ -3488,4 +3488,267 @@ private static String juego(String[] PALABRAS) {
     return match;
 }
 	
+/**
+ * Description : Este método se encarga verificar si la lista de char dada en el parametro no contiene el caracter "_" para verificar si la palabra fue adivinada
+ * @param palabraAdivinada : Este método recibe como parámetro una lista
+ * (De tipo char)
+ * @return <b>boolean</b> : Este método retorna un boolean true or false dependiendo de si cumple la condicion
+ * */
+private static boolean adivinado(char[] palabraAdivinada) {
+    for (char c : palabraAdivinada) {
+        if (c == '_') {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+/**
+ * Description : Este método se encarga de verificar si el parametro es una letra del alfabeto español, incluyendo ñ
+ * @param caracter : Este método recibe como parámetro un caracter que es ingresado por el usuario
+ * (De tipo char)
+ * @return <b>boolean</b> : Este método retorna un boolean true or false dependiendo de si cumple la condicion de ser una letra del alfabeto
+ * */
+private static boolean esLetraValida(char caracter) {
+    return (caracter >= 'A' && caracter <= 'Z') || caracter == 'Ñ' ||
+           (caracter >= '0' && caracter <= '9') || caracter == '.';
+}
+
+
+/**
+ * Description : Este método se encarga de mostrar por pantalla el bono que fue generado al cliente, ya sea de souvenir o de comida.
+ * @param productos : Es el arrayList de los productos disponibles a ser escogidos.
+ * @param numeroAleatorio : Es un numero generado aleatoreamente para ser usado en la escogencia del producto del bono
+ * @param name : Es un string con el nombre del tipo de bono.
+ * @param String : Es un String con el codigo de identificacion del bono
+ * @return <b>void</b> : No hay retorno
+ * */
+public static void mostrarBono(ArrayList<Producto> productos, int numeroAleatorio, String name, String code) {
+	
+	System.out.println("\n        ╔══════════════════════════╗");
+	if (name.equals("Comida")){
+		System.out.println("        ║        Bono "+name+"       ║");
+	}
+	else if(name.equals("Souvenir")) {
+		System.out.println("        ║        Bono "+name+"     ║");
+	}
+    
+    System.out.println("        ╠══════════════════════════╣");
+    String linea = "        ║ Producto: " + productos.get(numeroAleatorio).getNombre();
+    for (int i = linea.length(); i < 36; i++) {
+        if (i == 35) {
+            linea = linea + "║";
+        } else {
+            linea = linea + " ";
+        }
+    }
+    System.out.println(linea);
+    String line = "        ║ Codigo:   " + code;
+    for (int i = line.length(); i < 38; i++) {
+        if (i == 35) {
+            line = line + "║";
+        } else {
+            line = line + " ";
+        }
+    }
+    System.out.println(line);
+    System.out.println("        ╚══════════════════════════╝\n");
+}
+
+//------------------------------------------------------------------------------------------------------------------		
+	
+	//Bloque funcionalidad 5
+	
+// _____  _   _   _   _    _____   _    ____    _   _       __       _       _   _____       __       _____  	   ______  
+//|  __| | | | | | \ | |  / ____| | |  / __ \  | \ | |     /  \     | |     | | |  __ \     /  \     |  __ \ 	  |   ___|
+//| |__  | | | | |  \| | | |	  | | | |  | | |  \| |    /    \    | |     | | | |  | |   /    \    | |  | |	  |  |___
+//|  __| | | | | |	  \| | |      | | | |  | | |    \|   /  __  \   | |     | | | |  | |  /  __  \   | |  | |	  |___   |
+//| |    | |_| | | |\  | | \____  | | | |__| | | |\  |  / ______ \  | |___  | | | |__| | / ______ \  | |__| |	   ___|  |
+//|_|     \___/  |_| \_|  \_____| |_|  \____/  |_| \_| /_/      \_\ |_____| |_| |_____/ /_/      \_\ |_____/ 	  |______|    
+
+	
+	/**
+	 * Description : Este método se encarga de gestionar la funcionalidad 5: Sistema de membresías.
+	 * El cliente accede a nuestro menú donde se muestran las distintas opciones disponibles a escoger en la sucursal actual. Cada
+	 * opción tiene consigo sus respectivos beneficios y requisitos. Una vez se ha seleccionado, se realiza el pago de esta
+	 * y se asigna un apuntador de tipo Membresia en el atributo del cliente. Al realizar este proceso, los métodos de pago se ven
+	 * modificados, se activa la acumulación de puntos y se obtiene una cartelera personalizada.
+	 * @param clienteProceso : Se pide al cliente para realizar la búsqueda de membresías disponibles en el inventario de la sucursal actual.
+	 * Además, en base al tipo de membresía seleccionada, se modifican atributos del cliente como membresia, fechaLimiteMembresia, la lista de
+	 * métodos de pago, etc.
+	 */
+	private static void adquirirMembresia(Cliente clienteProceso) {
+		System.out.println("Bienvenido a nuestro plan de membresias en el cine de Marinilla, " + clienteProceso.getNombre() + ".");
+		boolean casoValido = false;
+		int opcionMenu = 0;
+		do {
+			try {
+				System.out.println("¿Desea ingresar o volver?" +"\n1.Ingresar" + "\n2.Volver al menú principal" + "\n3.Guardar y Salir");
+				opcionMenu = Integer.parseInt(sc.nextLine());
+			}catch(NumberFormatException e) {
+				System.out.println("Error, debes ingresar un dato numérico");
+				continue;
+			}
+			
+			switch (opcionMenu) {
+				case 1: casoValido = true; break;
+				case 2: Administrador.inicio(clienteProceso); casoValido = true; break;
+				case 3: Administrador.salirDelSistema(); casoValido = true; break;
+				default: System.out.println("Opción invalida."); break;
+			}
+			
+		}while(!casoValido);
+		//Se da a escoger al usuario la membresia
+		Membresia membresiaNueva = null;
+		do {
+			opcionMenu = 0;
+			System.out.print(Membresia.verificarMembresiaActual(clienteProceso));
+			System.out.print(Membresia.mostrarCategoria(clienteProceso, clienteProceso.getCineActual()) + "6. Volver al inicio.\n \nIngrese el número de la categoria deseada o volver al inicio: ");
+			opcionMenu = Integer.parseInt(sc.nextLine());
+			if (opcionMenu == 6) {Administrador.inicio(clienteProceso); break;}
+			else if (opcionMenu >0 && opcionMenu <6) {
+				//Se revisa si el cliente esta intentando seleccionar la misma categoria pero aún no es tiempo de renovarla.
+				if (clienteProceso.getMembresia()!=null && opcionMenu == clienteProceso.getMembresia().getCategoria() && clienteProceso.getFechaLimiteMembresia().minusDays(6).isAfter(SucursalCine.getFechaActual().toLocalDate())) {
+					System.out.println("Usted ya posee esta categoría.\nPor favor seleccionar otra opción habilitada o esperar hasta el periodo de renovación (5 días).\n");
+					continue;
+				}
+				//Se verifica si se cumple con los requisitos para adquirir la membresia.
+				boolean requisitosMembresia = Membresia.verificarRestriccionMembresia(clienteProceso, opcionMenu, clienteProceso.getCineActual());
+				System.out.print("\nCargando...\n");
+				try {
+				Thread.sleep(3000);
+				}catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+					if (requisitosMembresia == false) {
+						System.out.print("\nNo puedes adquirir esta membresía debido a que no cumples con \nlos criterios establecidos para ello o no hay unidades en el momento.️\n" +
+								"Puntos actuales: " + clienteProceso.getPuntos() + "\n" +
+								"Peliculas vistas: " + clienteProceso.getHistorialDePeliculas().size() + "\n" +
+								"\nRedirigiendo al menú de membresias\n");
+						continue;
+					} else {
+						membresiaNueva = Membresia.asignarMembresiaNueva(opcionMenu);
+					}
+			} else {
+				continue;
+			}
+		} while (membresiaNueva == null);
+		
+		//Una vez se ha escogido la membresia, se pasa a realizar el pago
+		double valorAPagar = membresiaNueva.getValorSuscripcionMensual();
+		do {
+			opcionMenu = 0;
+			System.out.print("El precio de la membresia es de " + valorAPagar 
+			+ ". Por favor, seleccione el método de pago a usar:\n"
+			+ MetodoPago.mostrarMetodosDePago(clienteProceso) + "\n6. Volver al inicio \nIngrese la opción: ");
+			opcionMenu = Integer.parseInt(sc.nextLine());
+			if (opcionMenu == 6) {Administrador.inicio(clienteProceso);}
+			//En caso de que el cliente intente escoger la opción de puntos pero no tenga membresía, se advierte y se vuelve a la selección de pagos.
+			else if (clienteProceso.getMembresia()==null && opcionMenu==5) {
+				System.out.println("\nPor favor, seleccione una de las opciones habilitadas.");
+				continue;
+			}
+			//Se obtiene le método de pago seleccionado en el menú anterior y se valida el nuevo precio en caso de tener descuento.
+			MetodoPago metodoPagoSeleccionado = MetodoPago.usarMetodopago(clienteProceso, opcionMenu);
+			try {
+				if (metodoPagoSeleccionado.getDescuentoAsociado() != 0 && valorAPagar == membresiaNueva.getValorSuscripcionMensual()) {
+					valorAPagar = valorAPagar - valorAPagar * metodoPagoSeleccionado.getDescuentoAsociado();
+					System.out.print("Con el método de pago " 
+						+ metodoPagoSeleccionado.getNombre()+ ", el nuevo monto a pagar es " 
+						+ valorAPagar +".\n1. Confirmar pago. \n2. Cambiar método de pago. \nPor favor, seleccione una opción: ");
+					
+				}else {
+					System.out.print("\nEl monto a pagar con el método de pago " 
+						+ metodoPagoSeleccionado.getNombre()+ " es " 
+						+ valorAPagar + ". \n1. Confirmar pago. \n2. Cambiar método de pago. \nPor favor, seleccione una opción: ");
+				}
+			opcionMenu = Integer.parseInt(sc.nextLine());
+			}catch (NumberFormatException e) {
+			System.out.print("Error, debes ingresar un dato numérico");}
+			
+			if (opcionMenu == 1) {
+				valorAPagar = metodoPagoSeleccionado.realizarPago(valorAPagar, clienteProceso);
+			} else if (opcionMenu == 2) {
+				valorAPagar = membresiaNueva.getValorSuscripcionMensual();
+				continue;
+			}
+		}while (valorAPagar != 0); 
+		
+		//Una vez confirmada la totalidad del pago, se procede realizar la asignación de membresía con sus beneficios.
+		System.out.print("\nEstamos procesando su pago...\n");
+		try {
+			Thread.sleep(3000);
+			}catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		membresiaNueva.procesarPagoRealizado(clienteProceso);
+		System.out.print(
+				"=== Factura de compra ===\n" +
+				"Nombre dueño: " + clienteProceso.getNombre() + "\n" +
+				"Documento: " + clienteProceso.getDocumento() + "\n" +
+				"Duración: " + clienteProceso.getFechaLimiteMembresia() + "\n" +
+				"Lugar de compra: " + clienteProceso.getCineActual().getLugar()	 + "\n" +
+				membresiaNueva.factura());
+		
+		//Cada vez que se adquiera/renueva una membresía, se dará una asignación/recarga a la tarjeta Cinemar que es usada en la funcionalidad 4.
+		TarjetaCinemar tarjetaCinemarActual = clienteProceso.getCuenta();
+		int tipoMembresia = 0;
+		if (tarjetaCinemarActual != null) {
+			tipoMembresia = clienteProceso.getMembresia().getTipoMembresia();
+			if (tipoMembresia == 1) {
+				tarjetaCinemarActual.ingresarSaldo(10000);
+			}else {
+				tarjetaCinemarActual.ingresarSaldo(20000);
+			}
+		}else {
+			boolean finalizarCompra = false;
+			double saldoCuenta = 0.0;
+			tipoMembresia = clienteProceso.getMembresia().getTipoMembresia();
+			if (tipoMembresia == 1) {
+				saldoCuenta = 5000.0;
+			} else {
+				saldoCuenta = 20000.0;
+			}
+			do {
+				try{
+					opcionMenu = 0;
+					System.out.print("\nGracias por adquirir el programa de membresia. Su nueva membresia es " + clienteProceso.getMembresia().getNombre() + " de categoria" + clienteProceso.getMembresia().getCategoria()+"\nComo regalo, le otorgamos una tarjeta cinemar con "
+							+ (int)saldoCuenta + " recargados.\n1. Confirmar.\n2. Rechazar. \nPor favor, seleccione una opción: ");
+					opcionMenu = Integer.parseInt(sc.nextLine());
+				}catch (NumberFormatException e){
+					System.out.print("Error. Por favor, escriba un dato numérico");}
+				if (opcionMenu == 1) {
+					Arkade.asociarTarjetaCliente(clienteProceso);
+					clienteProceso.getCuenta().ingresarSaldo(saldoCuenta);
+					System.out.println("\nEstos son los datos de su tarjeta:\nDueño: "+clienteProceso.getCuenta().getDueno().getNombre()+"\nSaldo: $"+clienteProceso.getCuenta().getSaldo());
+					System.out.print("\nGracias por su compra. Redirigiendo al menú principal.");
+					finalizarCompra = true;
+				} else {
+					try {
+						opcionMenu = 0;
+						System.out.print("Recuerde que esta oferta es única. ¿Esta seguro? \n1. Si. \n2. No. \nIngrese la opción: ");	
+						opcionMenu = Integer.parseInt(sc.nextLine());
+					}catch (NumberFormatException e){
+						System.out.print("Error. Por favor, escriba un dato numérico");}
+					if (opcionMenu == 1 ) {
+						System.out.print("Gracias por su compra. Redirigiendo al menú principal.");
+						finalizarCompra = true;
+					} else {
+						continue;
+					}
+				}
+				try {
+					Thread.sleep(3000);
+					}catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+			} while (!finalizarCompra);
+		}
+	}
+}
+
+	
+//------------------------------------------------------------------------------------------------------------------	
+		
 	
