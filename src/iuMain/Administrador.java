@@ -1313,3 +1313,953 @@ public class Administrador {
 			if (casoSeleccionExpirada) {
 				break;
 			}
+			
+			//Elegimos la columna del asiento
+			casoValidoConfirmacion = false;
+			do {
+				try {
+					System.out.print("\nDigite la columna de su asiento deseado: ");
+					columnaProceso = Integer.parseInt(sc.nextLine());
+				} catch(NumberFormatException e) {
+					System.out.println("\nError, debe ingresar un dato numérico correspondiente a alguna de las columnas disponibles");
+					continue;
+				}
+				
+				//Avance de tiempo para verificar si el horario aún se encuentra disponible en la sala de cine virtual (No ha sido actualizado)
+				avanzarTiempo();
+				
+				//Revisamos si el horario aún se encuentra disponible
+				try {
+					
+					if(!(columnaProceso > 0 & columnaProceso <= Integer.valueOf(peliculaProceso.getAsientosVirtuales().get(peliculaProceso.getHorarios().indexOf(horarioProceso))[filaProceso - 1].length))){
+						System.out.println("\nLa columna seleccionada no se encuentra disponible, le sugerimos que eliga una entre las disponibles");
+						continue;
+					}
+					
+				}catch (IndexOutOfBoundsException e) {
+					casoSeleccionExpirada = true;
+					System.out.println("\nEl horario seleccionado ha sido actualizado, actualmente se encuentra en presentación");
+					break;
+				}
+				
+				do {
+					opcionMenu = 0;
+					try {
+						System.out.println("\nLa columna seleccionada es: " + columnaProceso + "\n1. Correcto \n2. Cambiar columna");
+						opcionMenu = Integer.parseInt(sc.nextLine()); 
+					}catch (NumberFormatException e) {
+						System.out.println("\nError, debe ingresar un único dato numérico entre los disponibles");
+						continue;
+					}
+					
+				}while(!(opcionMenu == 1 || opcionMenu == 2));
+				
+				casoValidoConfirmacion = (opcionMenu == 1) ? true : false;
+				
+			}while(!(casoValidoConfirmacion));
+			
+			//Rompemos la lógica de la selección de asientos
+			if (casoSeleccionExpirada) {
+				break;
+			}
+			
+			//Modificamos el numeroAsientoProceso que se usa posteriormente al crear el ticket
+			numeroAsientoProceso = filaProceso + "-" + columnaProceso;
+			
+			if(peliculaProceso.isDisponibilidadAsientoSalaVirtual(horarioProceso, filaProceso, columnaProceso)) {
+				casoValido = true;
+				System.out.println("\nEl asiento " + numeroAsientoProceso + " ha sido seleccionado con éxito");
+			}else {
+				casoValido = false;
+				System.out.println("\nEl asiento " + numeroAsientoProceso + " no se encuentra disponible actualmente.\n" + 
+				"Se le solicita amablemente que seleccione uno de los asientos disponibles para disfrutar de su película.\n" + 
+				"A continuación se mostrarán en pantalla nuevamente los asientos con su respectiva disponibilidad\n");
+			}
+			
+		}while(!casoValido);
+		
+		return numeroAsientoProceso;
+	}
+	
+	/**
+	 * Description: Este método se encarga de seleccionar el número de asiento del cliente para ver una película que en estos momentos se encuentra en
+	 * presentación, para hacer esto, se muestra en pantalla los asientos de la sala de cine con su respectiva disponibilidad, el cliente elige la fila
+	 * luego la columna, se valida si el asiento en cuestión se encuentra disponible y también si la pelicula aún se encuentra en presentación y
+	 * no supera el tiempo límite de realizar la reserva de ticket de una película en presentación (20 minutos) y una vez cumplida la verificación,
+	 * retornamos el número del asiento seleccionado.
+	 * @param salaDeCinePresentacionProceso : Este método recibe como parámetro la sala de cine en la cuál se encuentra la película seleccionada durante
+	 * el proceso de la reserva de ticket.
+	 * @param peliculaProceso: Este método recibe como parámetro la película (De tipo Película) seleccionada por el usuario durante el proceso de reserva,
+	 * con el fin de validar si esta aún se encuentra en presentación.
+	 * @return <b>String</b> : Este método retorna un String que corresponde al número de asiento seleccionado por el cliente.
+	 * */
+	private static String seleccionarAsiento(SalaCine salaDeCinePresentacionProceso, Pelicula peliculaProceso) {
+		
+		boolean casoValidoConfirmacion = false;
+		boolean casoValido = false;
+		int opcionMenu = 0;
+		
+		String numeroAsientoProceso = null;
+		int filaProceso = 0;
+		int columnaProceso = 0;
+		
+		System.out.println("\n		Selección de asiento");
+		System.out.println("=====================================================");
+		
+		do {
+			System.out.println("\nEsta es la distribución de asientos con su disponibilidad \nactual de la película en el horario seleccionado" 
+			+ "\n X : Ocupado\n O : Disponible\n" + salaDeCinePresentacionProceso.mostrarAsientos());
+					
+			//Elegimos la fila del asiento
+			do {
+				try {
+					System.out.print("\nDigite la fila de su asiento deseado: ");
+					filaProceso = Integer.parseInt(sc.nextLine());
+				} catch(NumberFormatException e) {
+						System.out.println("\nError, debe ingresar un dato numérico correspondiente a alguna de las filas disponibles");
+						continue;
+				}
+						
+				if(!(filaProceso > 0 & filaProceso <= Integer.valueOf(salaDeCinePresentacionProceso.getAsientos().length))){
+					System.out.println("\nLa fila seleccionada no se encuentra disponible, le sugerimos que eliga una entre las disponibles");
+					continue;
+					}
+				
+				do {
+					opcionMenu = 0;
+					try {
+						System.out.println("\nLa fila seleccionada es: " + filaProceso + "\n1. Correcto \n2. Cambiar fila");
+						opcionMenu = Integer.parseInt(sc.nextLine()); 
+					}catch (NumberFormatException e) {
+						System.out.println("\nError, debe ingresar un único dato numérico entre los disponibles");
+					}
+					
+				}while(!(opcionMenu == 1 || opcionMenu == 2));
+						
+				casoValidoConfirmacion = (opcionMenu == 1) ? true : false;
+						
+			}while(!(casoValidoConfirmacion));
+					
+			//Elegimos la columna del asiento
+			casoValidoConfirmacion = false;
+			do {
+				try {
+					System.out.print("\nDigite la columna de su asiento deseado: ");
+					columnaProceso = Integer.parseInt(sc.nextLine());
+				} catch(NumberFormatException e) {
+					System.out.println("\nError, debe ingresar un dato numérico correspondiente a alguna de las columnas disponibles");
+					continue;
+				}
+						
+				if(!(columnaProceso > 0 & columnaProceso <= Integer.valueOf(salaDeCinePresentacionProceso.getAsientos()[filaProceso - 1].length))){
+					System.out.println("\nLa columna seleccionada no se encuentra disponible, le sugerimos que eliga una entre las disponibles");
+					continue;
+				}
+					
+				do {
+					opcionMenu = 0;
+					try {
+						System.out.println("\nLa columna seleccionada es: " + columnaProceso + "\n1. Correcto \n2. Cambiar columna");
+						opcionMenu = Integer.parseInt(sc.nextLine()); 
+					}catch (NumberFormatException e) {
+						System.out.println("\nError, debe ingresar un único dato numérico entre los disponibles");
+					}
+					
+				}while(!(opcionMenu == 1 || opcionMenu == 2));
+						
+				casoValidoConfirmacion = (opcionMenu == 1) ? true : false;
+						
+			}while(!(casoValidoConfirmacion));
+		
+			//Revisamos si el horario de la película en presentación ha sido modificado, comparando que el nombre sea el mismo
+			// y el horario de presentación más la duración de la película no exceda a la fecha actual
+			if(!verificarIntegridadHorarioSeleccionado(salaDeCinePresentacionProceso, peliculaProceso)) {
+				System.out.println("\nEl tiempo límite de compra de una película en presentación ha sido excedido (20 minutos a partir del inicio de la proyección).\nLe solicitamos esperar a la siguiente presentación ");
+				break;
+			}
+			
+			numeroAsientoProceso = filaProceso + "-" + columnaProceso;
+			
+			if(salaDeCinePresentacionProceso.isDisponibilidadAsiento(filaProceso, columnaProceso)) {
+				casoValido = true;
+				System.out.println("\nEl asiento " + numeroAsientoProceso + " ha sido seleccionado con éxito");
+			}else {
+				casoValido = false;
+				System.out.println("\nEl asiento " + numeroAsientoProceso + " no se encuentra disponible actualmente.\n" + 
+				"Se le solicita amablemente que seleccione uno de los asientos disponibles para disfrutar de su película.\n" + 
+				"A continuación se mostrarán en pantalla los asientos con su respectiva disponibilidad\n");
+			}
+			
+		}while(!casoValido);
+		
+		return numeroAsientoProceso;
+		
+	}
+	
+	/**
+	 * Description: <p>Este método se encarga de realizar el proceso para que un usario pueda ingresar a una de las salas de cine,
+	 * para esto debemos cumplir un requisito fundamental, el cual es que el cliente tenga al menos un ticket asociado correspondiente a la
+	 * sucursal desde la cual está intentando acceder, dado el caso de que no, el cliente será redirigido al menú del sistema de proyecciones,
+	 * en caso de que sí podemos continuar con el proceso.</p>
+	 * <p>Mostramos en pantalla las salas de cine disponibles con información relevante de estas (Número de sala, película en presentación y horario),
+	 * el cliente selecciona una de estas, verificamos que alguno de los tickets del cliente, cumpla con los requisitos necesarios para 
+	 * poder ingresar a la sala de cine, en caso de que sí, se muestra en pantalla una representación de la sala de cine y una vez termina 
+	 * la película se redirecciona al cliente al menú del sistema de proyecciones, en caso de que no, se vuelve a mostrar por pantalla las 
+	 * salas de cine disponibles.</p>
+	 * @param clienteProceso : Este método recibe como parámetro al cliente (De tipo Cliente), que ingresó desde el menú
+	 * del sistema de proyecciones.
+	 * */
+	private static void ingresarSalaCine(Cliente clienteProceso) {
+		
+		boolean finalizarLogicaIngresarSalaCine = false;
+		do {
+			
+			System.out.println("\nSistema de ingreso a la sala de cine\n");
+			
+			//Elección menú inicial
+			boolean volverAlMenu = false;
+			boolean casoValido = false;
+			int opcionMenu;
+			do {
+				opcionMenu = 0;
+				try {
+					System.out.println("¿Desea ingresar o volver?" +"\n1. Ingresar" + "\n2. Volver al menú anterior");
+					opcionMenu = Integer.parseInt(sc.nextLine());
+				}catch(NumberFormatException e) {
+					System.out.println("Error, debes ingresar un dato numérico");
+					continue;
+				}
+				
+				switch (opcionMenu) {
+					case 1: casoValido = true; break;
+					case 2: volverAlMenu = true; casoValido = true; break;
+					default: System.out.println("\nOpción invalida");
+				}
+				
+			}while(!casoValido);
+			
+			if(volverAlMenu) {
+				//Rompemos la lógica de ingresar a las salas de cine
+				break;
+			}
+			
+			//Avance de tiempo para tomar las salas de cine actualizadas
+			avanzarTiempo();
+			
+			//Tomamos las salas de cine que aún tienen películas en presentación y no han finalizado
+			ArrayList<SalaCine> salasDeCineDisponibles = SalaCine.filtrarSalasDeCine(clienteProceso.getCineActual());
+			
+			//En caso de no encontrar salas de cine, regresamos al menú principal
+			if (salasDeCineDisponibles.isEmpty()) {
+				System.out.println("\nNo hay películas en presentación, redireccionando al menú del sistema de proyeccion de películas...");
+				break;
+			}
+			
+			//Eliminamos los tickets caducados sin consumir que el cliente tenga asociados 
+			clienteProceso.dropTicketsCaducados();
+			
+			//Filtramos los tickets que puede usar el cliente
+			ArrayList<Ticket> ticketsDisponiblesParaUsar = clienteProceso.filtrarTicketsParaSede();
+			
+			//Verificamos que el cliente tenga al menos un ticket de esta sucursal para continuar con el proceso
+			if(ticketsDisponiblesParaUsar.size() > 0) {
+				System.out.println("\nBienvenido al sistema de ingreso a las sala de cine");
+			}else {
+				System.out.println("No has comprado ningún ticket o no tienes un ticket de una película de esta sede, te redireccionaremos al menú principal");
+				break;
+			}
+			//Iniciamos el proceso para ingresar a una sala de cine
+			SalaCine salaDeCineProceso = null;
+			casoValido = false;
+			boolean casoValidoEleccionSala = false;
+			boolean casoValidoConfirmacion = false;
+			do {
+				do {
+					do {
+						
+						opcionMenu = 0;
+						//Mostramos el listado de los tickets disponibles
+						System.out.println("\n		Hola " + clienteProceso.getNombre());
+						System.out.println("==================================================\n");
+						System.out.println( "\nFecha actual: "+ SucursalCine.getFechaActual().toLocalDate() 
+						+ "; Hora actual: " + SucursalCine.getFechaActual().toLocalTime().withNano(0) + "\n\n"
+						+ "Estos son los tickets que actualmente tienes disponibles:" 
+						+ clienteProceso.mostrarTicketsParaUsar(ticketsDisponiblesParaUsar) + "\n");
+						//Mostramos el listado de las salas de cine disponibles para que el cliente elija una de estas
+						System.out.println("Este es el listado de las salas de cine disponibles: \n" 
+						+ SalaCine.mostrarSalaCine(salasDeCineDisponibles) + "\n" + (Integer.valueOf(salasDeCineDisponibles.size()) + 1) 
+						+ ". Regresar al menú de sistema de proyecciones");
+						
+						try {
+							
+							System.out.print("\nElige una de las salas de cine disponibles: ");
+							opcionMenu = Integer.parseInt(sc.nextLine());
+							
+						}catch(NumberFormatException e) {
+							System.out.println("\nError, debes ingresar un único dato numérico entre los disponibles");
+						}
+						
+						if (opcionMenu > 0 & opcionMenu <= (Integer.valueOf(salasDeCineDisponibles.size()) ) ) { 
+							//Obtenemos la sala de cine seleccionada
+							salaDeCineProceso = salasDeCineDisponibles.get(opcionMenu - 1);
+							casoValidoEleccionSala = true;
+							
+						}else if (opcionMenu == (Integer.valueOf(salasDeCineDisponibles.size()) + 1)) {
+							//Regresamos al menú principal
+							volverAlMenu = true;
+							casoValidoEleccionSala = true;
+			
+						}else {
+							System.out.println("\nOpción inválida");
+						}
+						
+					}while( !casoValidoEleccionSala );
+					
+					if(volverAlMenu) {
+						//Rompemos la lógica de caso valido confirmacion de ingreso a sala seleccionada
+						break;
+					}
+					
+					//Confirmamos la seleccion de sala
+					do {
+						opcionMenu = 0;
+						try {
+							System.out.println("\nHas seleccionado la sala de cine número: " + salaDeCineProceso.getNumeroSala() 
+							+ "\n1. Correcto\n2. Cambiar sala de cine");
+							opcionMenu = Integer.parseInt(sc.nextLine());
+						}catch(NumberFormatException e) {
+							System.out.println("Error, debes ingresar un único dato numérico entre los disponibles");
+						}
+						
+					}while(!(opcionMenu == 1 || opcionMenu == 2));
+					
+					casoValidoConfirmacion = (opcionMenu == 1) ? true : false;
+					
+				}while(!casoValidoConfirmacion);
+				
+				//Rompemos la lógica de caso válido de ingreso a la sala de cine
+				if(volverAlMenu) {
+					break;
+				}
+				
+				//Avance de tiempo para aplicar correctamente la verificación de ingreso a la sala de cine
+				avanzarTiempo();
+				
+				//Realizamos la verificación y evaluamos si el cliente puede ingresar a la sala de cine
+				if (salaDeCineProceso.verificarTicket(clienteProceso)) {
+					
+					//Mostramos un dibujo en consola de la sala de cine
+			        System.out.println("\n" + salaDeCineProceso.mostrarPantallaSalaCine());
+			        System.out.println("\n¡Bienvenido al cine!, Disfrute de la película");
+			        try {
+						Thread.sleep(3000);
+					}catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+			        
+			        System.out.println("La película ha finalizado, muchas gracias por asistir le deseamos un feliz resto de día" + 
+			        "\n(Redirigiendo al menú del sistema de proyecciones...)");
+			        try {
+						Thread.sleep(3000);
+					}catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+			        
+			        casoValido = true;
+			        
+			        //Actualizamos el estado de la fecha actual, de las películas y las salas de cine 
+			        SucursalCine.setFechaActual(salaDeCineProceso.getHorarioPeliculaEnPresentacion().plus(salaDeCineProceso.getPeliculaEnPresentacion().getDuracion()));
+			        avanzarTiempo();
+			        
+				}else {
+					System.out.println("\nNo tienes un ticket válido o no cumple con los requisitos para ingresar a esta sala de cine" 
+					+ "\nSerás redireccionado a la elección de salas de cine");
+					
+					//Filtramos de nuevo las salas de cine disponibles
+					salasDeCineDisponibles = SalaCine.filtrarSalasDeCine(clienteProceso.getCineActual());
+					
+					//Eliminamos los tickets caducados sin consumir que el cliente tenga asociados 
+					clienteProceso.dropTicketsCaducados();
+					
+					//Filtramos los tickets que puede usar el cliente
+					ticketsDisponiblesParaUsar = clienteProceso.filtrarTicketsParaSede();
+					
+					if (ticketsDisponiblesParaUsar.isEmpty()) {
+						System.out.println("No tienes tickets disponibles para ingresar a las salas de cine");
+						casoValido = true;
+					}
+
+				}
+				
+			}while(!casoValido);
+			
+			finalizarLogicaIngresarSalaCine = true;
+			
+		}while(!finalizarLogicaIngresarSalaCine);
+				
+	}
+	
+	/**
+	 * Description : Este método se encarga de avanzar el tiempo del programa según el horario de la película del ticket del cliente, 
+	 * para que este pueda verla. Para hacer esto, mostramos en pantalla los tickets disponibles del cliente, el cliente selecciona uno de ellos,
+	 * setteamos la hora actual con la hora de la película y actualizamos las salas de cine (Un cliente sin tickets o sin tickets de esta sucursal 
+	 * no puede ingresar a esta sala, además antes de verficar eso, eliminamos los tickets que ya han caducado).
+	 * @param clienteProceso : Este método recibe como parámetro el cliente (De tipo Cliente) que realizó el proceso de login.
+	 * */
+	private static void ingresarSalaDeEspera(Cliente clienteProceso) {
+		boolean finalizarLogicaSalaDeEspera = false;
+		do {
+			
+			System.out.println("\nIngreso a sala de espera");
+			
+			//Elección menu inicial
+			boolean volverAlMenu = false;
+			boolean casoValido = false;
+			boolean casoValidoConfirmacion = false;
+			int opcionMenu = 0;
+			do {
+				try {
+					System.out.println("¿Desea ingresar o volver?" +"\n1. Ingresar" + "\n2. Volver al menú anterior");
+					opcionMenu = Integer.parseInt(sc.nextLine());
+				}catch(NumberFormatException e) {
+					System.out.println("Error, debes ingresar un dato numérico");
+					continue;
+				}
+				
+				switch (opcionMenu) {
+					case 1: casoValido = true; break;
+					case 2: volverAlMenu = true; casoValido = true; break;
+					default: System.out.println("Opción invalida");
+				}
+				
+			}while(!casoValido);
+			
+			if(volverAlMenu) {
+				//Rompemos la lógica de ingresar a la sala de espera
+				break;
+			}
+			
+			//Avance de tiempo para tomar los tickets más recientes
+			avanzarTiempo();
+			
+			//Validamos si el cliente tiene tickets disponibles
+			clienteProceso.dropTicketsCaducados();
+			//Filtramos los tickets que el cliente puede usar
+			ArrayList<Ticket> ticketsDisponiblesParaUsar = clienteProceso.filtrarTicketsParaSede();
+			
+			if ((ticketsDisponiblesParaUsar.size() == 0)) {
+				System.out.println("Debes tener al menos un ticket de alguna película de esta sede para hacer uso de esta sala (Redireccionando al menú principal...)");
+				break;
+			}
+			
+			Ticket ticketParaUsar = null;
+			casoValido = false;
+			
+			System.out.println("\nBienvenido a la sala de espera, "+ clienteProceso.getNombre() + ",\n" +
+			"===============================================================\n" +
+			"Aquí puedes esperar a que pase el tiempo para poder" + 
+			"\ningresar a la película de alguno de los tickets que adquriste");
+			
+			//Mostramos en pantalla los tickets disponibles y el usuario selecciona uno de estos
+			do {
+				opcionMenu = 0;
+				System.out.println( "\nFecha actual: "+ SucursalCine.getFechaActual().toLocalDate() 
+				+ "; Hora actual: " + SucursalCine.getFechaActual().toLocalTime().withNano(0) + "\n\n"
+				+ "Estos son los tickets que actualmente tienes disponibles:" 
+				+ clienteProceso.mostrarTicketsParaUsar(ticketsDisponiblesParaUsar)
+				+ "\n" + (ticketsDisponiblesParaUsar.size() + 1) + ". Volver al menú del sistema de proyecciones\n");
+				
+				try {	
+					System.out.print("Selecciona un ticket entre los disponibles: ");
+					opcionMenu = Integer.parseInt(sc.nextLine());
+				}catch(NumberFormatException e) {
+					System.out.println("Error, debes ingresar un único dato numérico entre los disponibles");
+					continue;
+				}
+				
+				if (opcionMenu > 0 && opcionMenu <= ticketsDisponiblesParaUsar.size()) {
+					ticketParaUsar = ticketsDisponiblesParaUsar.get(opcionMenu - 1);
+				}else if (opcionMenu == ticketsDisponiblesParaUsar.size() + 1) {
+					volverAlMenu = true;
+					break;
+				}else {
+					System.out.println("Error, por favor elige uno de los tickets disponibles");
+					continue;
+				}
+				
+				System.out.println("\nADVERTENCIA: Los tickets entre el horario que intenta omitir y el actual, en caso de tenerlos, serán eliminados\n");
+				
+				do {
+					opcionMenu = 0;
+					try {
+						System.out.println("\nEl ticket seleccionado es para la película " + ticketParaUsar.getPelicula().getNombre()
+						+ "; El día " + ticketParaUsar.getHorario().getDayOfWeek() + ";\nfecha " + ticketParaUsar.getHorario().toLocalDate() 
+						+ "; A las " + ticketParaUsar.getHorario().toLocalTime()
+						+"\n¿Es esto correcto?\n1. Correcto\n2. Cambiar ticket");
+						opcionMenu = Integer.parseInt(sc.nextLine());
+					}catch(NumberFormatException e) {
+						System.out.println("Error, debes ingresar un único dato numérico entre los disponibles");
+						continue;
+					}
+					
+					if((opcionMenu == 1 || opcionMenu == 2 )) {
+						casoValidoConfirmacion = true;
+					}else {
+						System.out.println("Opción inválida");
+					}
+					
+				}while(!casoValidoConfirmacion);
+				
+				casoValido = (opcionMenu == 1) ? true : false;
+				
+			}while(!casoValido);
+			
+			if (volverAlMenu) {
+				//Rompemos la lógica del sistema de ingresar a la sala de espera
+				break;
+			}
+			
+			//Avance de tiempo para hacer la verificación de caducidad correctamente
+			avanzarTiempo();
+			
+			//Verificamos si el ticket no ha caducado
+			if (ticketParaUsar.getHorario().isBefore(SucursalCine.getFechaActual())) {
+				System.out.println("\nEl ticket seleccionado no puede ser usado, debido a que ha caducado o su película se encuentra en presentación");
+				continue;
+			}
+			
+			//Mostramos en pantalla el resultado del proceso
+			System.out.println("\nEsperando...");
+			try {
+				Thread.sleep(3000);
+			}catch(InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			//Actualizamos el estado de la fecha actual, de las películas y las salas de cine 
+			SucursalCine.setFechaActual(ticketParaUsar.getHorario());
+			avanzarTiempo();
+			System.out.println("La fecha actual ha sido actualizada con éxito ( " + SucursalCine.getFechaActual() + " )\n(Redireccionando al menú principal...)");
+			
+			finalizarLogicaSalaDeEspera = true;
+			
+		}while(!finalizarLogicaSalaDeEspera);
+	}
+	
+	/**
+	 * Description : Este método se encarga de generar las dos opciones extra luego de evaluar si una película se encuentra en presentación
+	 * @param horariosPeliculaProceso : Este método recibe como parámetro los horarios de la pelicula seleccionada por el usuario durante el proceso
+	 * (De tipo ArrayList<LocalDateTime>)
+	 * @return <b>String</b> : Este método retorna, en caso de tener horarios disponibles, la opción de comprar en otro horario o volver al menú
+	 * principal, sino, la opcion de volver al menú principal.
+	 * */
+	private static String disponibilidadHorariaFuncionalidad1(ArrayList<LocalDateTime> horariosPeliculaProceso) {
+		String resultado = null;
+		if (horariosPeliculaProceso.size() > 0) {
+			resultado = "\n2. Comprar en otro horario\n3. Volver al menú del sistema de proyecciones";
+		}else {
+			resultado = "\n2. Volver al menú del sistema de proyecciones";
+		}
+		
+		return resultado;
+	}
+	
+	/**
+	 * Description : Este método se encarda de verificar si el proceso de reserva del ticket, desde una película en presentación, ha sido afectado 
+	 * por el avance del tiempo, para esto revisamos dos cosas: 
+	 * <ol>
+	 * <li>El horario de la película en presentación de la sala de cine más 20 minutos (15 minutos de la posibilidad de compra y 5 minutos 
+	 * para realizar el proceso) es anterior a la fecha actual.</li>
+	 * <li>La película seleccionada por el usuario durante el proceso corresponde a la película que se encuentra en presentación.</li>
+	 * </ol>
+	 * @param salaDeCineProceso : Este método recibe como parámetro la sala de cine (De tipo SalaCine) donde está siendo presentada la película 
+	 * seleccionada por el cliente.
+	 * @param peliculaProceso : Este método recibe como parámetro la pelicula (De tipo Pelicula) seleccionada por el usuario durante el proceso
+	 * de reserva de ticket.
+	 * @return <b>boolean</b> : Este método retorna el estado de la validación para tomar determinadas acciones respecto a esta.
+	 * */
+	private static boolean verificarIntegridadHorarioSeleccionado(SalaCine salaDeCineProceso, Pelicula peliculaProceso) {
+		
+		//Avance de tiempo
+		avanzarTiempo();
+		
+		if((salaDeCineProceso.getPeliculaEnPresentacion().equals(peliculaProceso)) 
+		&& (salaDeCineProceso.getHorarioPeliculaEnPresentacion().plus(Duration.ofMinutes(20)).isAfter(SucursalCine.getFechaActual()))) {
+			return true;
+		}
+		return false;
+		
+	}
+	
+	/**
+	 * Description : Este método se encarga de verificar si el proceso de reserva de ticket, desde un horario que no se encuentra en presentación,
+	 * ha sido afectado por el avance del tiempo, para esto, se verifica si en el array de horarios de la película, se encuentra el horario seleccionado
+	 * por el cliente.
+	 * @param peliculaProceso : Este método recibe como parámetro la pelicula (De tipo Pelicula) seleccionada por el usuario durante el proceso
+	 * de reserva de ticket.
+	 * @param horarioProceso : Este método recibe como parámetro el horario (De tipo LocalDateTime) seleccionado por el usuario durante el proceso 
+	 * de reserva de ticket.
+	 * @return <b>boolean</b> : Este método retorna el estado de la validación para tomar determinadas acciones respecto a esta.
+	 * */
+	private static boolean verificarIntegridadHorarioSeleccionado(Pelicula peliculaProceso, LocalDateTime horarioProceso) {
+		
+		//Avance de tiempo
+		avanzarTiempo();
+		
+		if (peliculaProceso.getHorarios().contains(horarioProceso)) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	
+	/**
+	* Description: Este metodo se encarga de mostrar por pantalla la hora actual de una manera mas organzida y estética.
+	* @params date: Se pasa un localDateTime para ejecutar la logica del método.
+	* */
+	private static void relojDigital(LocalDateTime date) {
+		
+		// Formatear la hora en formato hh:mm:ss a AM/PM
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss a");
+        String formattedTime = date.format(timeFormatter);
+
+        // Formatear la fecha en un formato amigable
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy");
+        String formattedDate = date.format(dateFormatter);
+        
+        
+     // Imprimir la hora en un estilo más decorativo
+        System.out.println("\n╔══════════════════════════════╗");
+        System.out.println("║       Current Date           ║");
+        System.out.println("    " + formattedDate + "     ");
+        System.out.println("║                              ║");
+        System.out.println("         " + formattedTime +"        ");
+        System.out.println("╚══════════════════════════════╝");
+        System.out.println();
+	}
+	
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	
+	//Bloque funcionalidad 2
+		
+	// _____  _   _   _   _    _____   _    ____    _   _       __       _       _   _____       __       _____  	    ______
+	//|  __| | | | | | \ | |  / ____| | |  / __ \  | \ | |     /  \     | |     | | |  __ \     /  \     |  __ \ 	   / __   |
+	//| |__  | | | | |  \| | | |	  | | | |  | | |  \| |    /    \    | |     | | | |  | |   /    \    | |  | |	  |_/ /   /
+	//|  __| | | | | |	  \| | |      | | | |  | | |    \|   /  __  \   | |     | | | |  | |  /  __  \   | |  | |	     /   /
+	//| |    | |_| | | |\  | | \____  | | | |__| | | |\  |  / ______ \  | |___  | | | |__| | / ______ \  | |__| |	    /	/_
+	//|_|     \___/  |_| \_|  \_____| |_|  \____/  |_| \_| /_/      \_\ |_____| |_| |_____/ /_/      \_\ |_____/ 	   |_______|
+	
+	private static void compras(Cliente clienteProceso){
+		// Seleccion del servicio que se desea acceder
+		
+		Servicio serviciProceso;
+		boolean verificacion = true;
+		int servicio = 0;
+		int cantidad = 0;
+		
+		//////////////////////////////////////   Seleccion del servicio   ///////////////////////////////////////////
+		
+		System.out.println("\n ====== Bienvenido a los servicios de compra ====== \n");
+		
+		//Le pedimos el servicio al cual desea acceder
+		
+		do {
+			try {
+				for(int i = 0;i<clienteProceso.getCineActual().getServicios().size();i++) {
+					int n = i+1; 
+					System.out.println(n+". "+"Servicio "+clienteProceso.getCineActual().getServicios().get(i).getNombre());
+				}
+				System.out.print("0.Volver al menu.\n\nSeleccione una opcion: ");
+				servicio = Integer.parseInt(sc.nextLine());
+			}catch(NumberFormatException e) {
+				System.out.println("\nError, debes ingresar un dato numérico\n");
+				continue;
+			}
+			if (servicio == 0) {
+				Administrador.inicio(clienteProceso);
+				break;
+			}
+			else if (servicio == 1 || servicio == 2) {
+				servicio = servicio - 1;
+				verificacion = false;
+			}
+			
+		}while(verificacion);
+		
+		//Servicio de comida
+		
+			
+		//Filtramos el inventario segun el servicio y la sucursal del cine
+		serviciProceso = clienteProceso.getCineActual().getServicios().get(servicio);
+		System.out.print("\n Bienvenido al servicio "+ serviciProceso.getNombre());
+		serviciProceso.setCliente(clienteProceso);
+		serviciProceso.setInventario(serviciProceso.actualizarInventario()); //Ligadura dinamica
+		
+		/////////////////////////////////  Busqueda inteligente de los productos disponibles segun el pedido   ///////////////////////////////////////////
+		
+		//Mostramos los productos que hay disponibles en la sucursal y 
+		//le pedimos que seleccione uno y la cantidad de producto que desea
+		
+		verificacion = true;
+		boolean verificacion2 = true;
+		int eleccion = 0;
+		do {
+			try {
+				System.out.print("\n"+serviciProceso.mostrarInventario());
+				if(serviciProceso.getOrden().size()>0) {
+					System.out.print("\n"+(serviciProceso.getInventario().size()+1)+". Eliminar un producto de la orden");
+				}
+				if (serviciProceso.mostrarInventario() == "\nNO HAY PRODUCTOS DISPONIBLES :(\n") {
+					Administrador.inicio(clienteProceso);
+				}
+				System.out.print("\n\nSelecciones una opcion de los productos: ");
+				eleccion = Integer.parseInt(sc.nextLine());
+				if (eleccion == 0) {
+					break;
+				}
+				
+				if (eleccion > serviciProceso.getInventario().size()+1 || eleccion < 1) {
+					System.out.print("ERROR EN LA SELECCION DEL PRODUCTO");
+					continue;
+				}
+				
+				if (eleccion < serviciProceso.getInventario().size()+1 ) {
+					eleccion = eleccion - 1;
+					System.out.print("\nIngrese el numero de productos que deseas llevar: ");
+					cantidad = Integer.parseInt(sc.nextLine());
+				}
+				
+				if (eleccion == serviciProceso.getInventario().size()+1) {
+					
+					int eleccion2;
+					verificacion = true;
+					do {
+						try {
+							System.out.print("\n"+serviciProceso.mostrarOrden());
+							System.out.print("\nSeleccione el producto que quieres eliminar: ");
+							eleccion2 = Integer.parseInt(sc.nextLine());
+							System.out.print("\n\nSeleccione la cantidad de productos que deasea quitar de su orden: ");
+							cantidad = Integer.parseInt(sc.nextLine());
+						}catch(NumberFormatException e) {
+							System.out.println("\nError, debes ingresar un dato numérico\n");
+							continue;
+						}
+						if (eleccion2 > serviciProceso.getOrden().size()+1 ) {
+							System.out.print("ERROR EN LA SELECCION DEL PRODUCTO");
+							continue;
+						}
+						else if(cantidad > serviciProceso.getOrden().get(eleccion2-1).getCantidad()) {
+							System.out.print("ERROR EN LA CANTIDAD DE PRODUCTOS QUE DESEA ELIMINAR");
+						}
+						else if (eleccion2 == 0) {
+							verificacion = false;
+						}
+						else {
+							if (cantidad == serviciProceso.getOrden().get(eleccion2-1).getCantidad()) {
+								serviciProceso.getOrden().remove(eleccion2-1);
+								verificacion = false;
+							}
+							else {
+								double total;
+								total = serviciProceso.getOrden().get(eleccion2-1).getPrecio() / serviciProceso.getOrden().get(eleccion2-1).getCantidad();
+								serviciProceso.getOrden().get(eleccion2-1).setCantidad(serviciProceso.getOrden().get(eleccion2-1).getCantidad() - cantidad);
+								serviciProceso.getOrden().get(eleccion2-1).setPrecio(total * serviciProceso.getOrden().get(eleccion2-1).getCantidad());
+								verificacion = false;
+								Producto producto = serviciProceso.getOrden().get(eleccion2-1);
+								for (Producto producto2 : serviciProceso.getInventario()) {
+									if (producto2.getNombre() == producto.getNombre() && producto2.getTamaño() == producto.getTamaño()) {
+										producto2.setCantidad(producto2.getCantidad() + cantidad);
+									}
+								}
+							}
+						}
+						
+					}while(verificacion);
+				}
+			}catch(NumberFormatException e) {
+				System.out.println("\nError, debes ingresar un dato numérico\n");
+				continue;
+			}
+			
+			verificacion = true;
+			// Se verifica si hay suficientes productos segun la cantidad que pidio el cliente
+			
+			if (eleccion < serviciProceso.getInventario().size() ) {
+				
+				Producto producto = serviciProceso.hacerPedido(eleccion, cantidad);
+				if(producto == null) {
+					System.out.print("\nNo hay suficientes productos de: "+serviciProceso.getInventario().get(eleccion).getNombre()+
+							serviciProceso.getInventario().get(eleccion).getTamaño()+" (╥_╥)(╥_╥)(╥_╥) \n\nEn el momento solo hay disponible: "+
+							serviciProceso.getInventario().get(eleccion).getCantidad());
+				}
+				else {
+					System.out.print("  --------------------------------------------------- \n");
+					System.out.print(" |          El pedido fue realizado con exito        |\n");
+					System.out.print("  ---------------------------------------------------  \n");
+					serviciProceso.agregarOrden(producto);
+					System.out.print("\n Los productos que llevas en el momento son:\n");
+					System.out.print(serviciProceso.mostrarOrden());
+					do {
+						try {
+							System.out.print("\n\n"+"¿Quieres hacer otro pedido? \n1.SI \n2.NO"+
+						"\nSeleccione una opcion: ");	
+							eleccion = Integer.parseInt(sc.nextLine());
+						}catch(NumberFormatException e) {
+							System.out.println("\nError, debes ingresar un dato numérico\n");
+							continue;
+						}
+						verificacion2 = false;
+						if(eleccion == 2){
+							verificacion = false;
+						}
+						
+					}while(verificacion2);
+				}
+			}
+			
+			if (eleccion == serviciProceso.getInventario().size()+1) {
+				System.out.print("  --------------------------------------------------- \n");
+				System.out.print(" |            El pedido eliminado con exito v        |\n");
+				System.out.print("  ---------------------------------------------------  \n");
+				System.out.print("\n Los productos que llevas en el momento son: \n");
+				System.out.print(serviciProceso.mostrarOrden());
+				do {
+					try {
+						System.out.print("\n\n"+"¿Quieres hacer otro pedido? \n1.SI \n2.NO"+
+					"\nSeleccione una opcion: ");	
+						eleccion = Integer.parseInt(sc.nextLine());
+					}catch(NumberFormatException e) {
+						System.out.println("\nError, debes ingresar un dato numérico\n");
+						continue;
+					}
+					verificacion2 = false;
+					if(eleccion == 2){
+						verificacion = false;
+					}
+					
+				}while(verificacion2);
+			}
+		}while(verificacion);
+		
+		//////////////////////////////////////   Descuento asociado a las peliculas   ///////////////////////////////////////////
+		
+		/* Se verifica si tiene un producto con el mismo genero de un ticket y si es asi se le aplica el descuento,
+		 * solo se hace un decuento por compra
+		 */
+		
+		if(serviciProceso.getOrden().size()>0) {
+			Producto productoDescuento = serviciProceso.descuentarPorGenero(clienteProceso.getCineActual());
+			
+			if (productoDescuento != null){
+				
+				System.out.print("                ------------------------------------------------------------------- \n");
+				System.out.print("               |                Felicidades obtuviste un descuento                 |\n");
+				System.out.print("               |Por comprar un producto del mismo genero que el tiket que compraste|\n");
+				System.out.print("                ------------------------------------------------------------------- \n");
+				System.out.print("Todos los productos de :"+ productoDescuento.getNombre() + productoDescuento.getTamaño() +" Obtuvieron un descuento del 10% en esta compra \n");
+				System.out.print("Precio anterior --> $"+productoDescuento.getPrecio()+" Precio actual --> $");
+				productoDescuento.setPrecio(productoDescuento.getPrecio()*0.9);
+				System.out.println(productoDescuento.getPrecio());
+				System.out.print("\nLos productos que llevas en el momento son: \n");
+				System.out.print(serviciProceso.mostrarOrden());
+				
+				
+			}
+		}
+		
+		//////////////////////////////////////  Validacion de los bonos  y codigos de bonos   ///////////////////////////////////////////
+		
+		//Validacion de los bonos
+		boolean verificacionR = true;
+		verificacion = true;
+		do {
+			serviciProceso.actualizarBonos();
+			if (0 < serviciProceso.getBonosCliente().size()) {
+				do {
+					try {
+						System.out.println(Servicio.mostrarBonos(serviciProceso));
+						System.out.print("Seleccione una opcion: ");
+						eleccion = Integer.parseInt(sc.nextLine());
+						if (eleccion > serviciProceso.getBonosCliente().size()) {
+							System.out.println("\nError, debes escoger una opcion correcta\n");
+							continue;
+						}
+					}catch(NumberFormatException e) {
+					System.out.println("\nError, debes ingresar un dato numérico\n");
+					continue;
+				}
+					verificacion = false;
+				}while(verificacion);
+				
+				if (eleccion == 0) {
+					break;
+				}
+				
+				Producto productoBono1 = Servicio.validarBono(serviciProceso.getBonosCliente().get(eleccion-1).getCodigo(),serviciProceso);
+				
+				if(productoBono1.comprobarBonoEnOrden(serviciProceso)) {
+					verificacion = true;
+					do {
+						try {
+							System.out.print("\n"+"¿Que deseas hacer con el producto?\n1.Desea agregarlo al pedido"+
+									"\n2.Desea descontarlo del pedido\nSelecciona una opcion:");
+							eleccion = Integer.parseInt(sc.nextLine());
+						}catch(NumberFormatException e) {
+							System.out.println("\nError, debes ingresar un dato numérico\n");
+							continue;
+						}
+
+						if (eleccion == 1) {
+							productoBono1.setPrecio(0);
+							productoBono1.setNombre("Regalo de Bono "+productoBono1.getNombre());
+							serviciProceso.getOrden().add(productoBono1);
+							System.out.print("\n Los productos que llevas en el momento son: \n");
+							System.out.print(serviciProceso.mostrarOrden());
+							verificacion = false;
+						}
+						else if (eleccion == 2){
+							serviciProceso.descontarProducto(productoBono1);
+							System.out.print("\n Los productos que llevas en el momento son: \n");
+							System.out.print(serviciProceso.mostrarOrden());
+							verificacion = false;
+						}
+						else {
+							System.out.print("\n\\nSELECCIONE UNA OPCION VALIDA\\n\n");
+						}
+					}while(verificacion);
+				}
+				else if (productoBono1 != null){
+					productoBono1.setPrecio(0);
+					productoBono1.setNombre("Regalo de bono "+productoBono1.getNombre());
+					serviciProceso.getOrden().add(productoBono1);
+					System.out.print("\n Los productos que llevas en el momento son: \n");
+					System.out.println(serviciProceso.mostrarOrden());
+				}
+				if ( 0 < serviciProceso.getBonosCliente().size()-1) {
+					do {
+						try {
+							
+							System.out.print("\n\n¿Deseas reclamar otro Bono?\n1.SI\n2.NO\nSelecciona una opcion:");
+							eleccion = Integer.parseInt(sc.nextLine());
+						}catch(NumberFormatException e) {
+							System.out.println("\nError, debes ingresar un dato numérico\n");
+							continue;
+						}
+						if (eleccion == 2) {
+							verificacionR = false;
+						}
+						else if (eleccion != 1 && eleccion != 2) {
+							System.out.print("\nSELECCIONE UNA OPCION VALIDA\n");
+						}
+					}while(eleccion != 1 && eleccion != 2);
+				}
+				else {
+					verificacionR = false;
+				}
+			}
+			else {
+				verificacionR = false;
+			}
+			
+		}while(verificacionR);
