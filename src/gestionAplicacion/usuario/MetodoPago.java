@@ -1,8 +1,9 @@
 package gestionAplicacion.usuario;
 
+import gestionAplicacion.SucursalCine;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import gestionAplicacion.SucursalCine;
 
 /**
  * @author Jeronimo Rua Herrera
@@ -38,7 +39,7 @@ public class MetodoPago implements Serializable{
 	
 	//Constructor usado para ser llamado en un metodo que se encarga de crear varias instancias de los métodos de
 	//pago con distinto tipo. Esto para usarse en la funcionalidad 5.
-	public MetodoPago(String nombre, double descuentoAsociado,	 double limiteMaximoPago, int tipo) {
+	public MetodoPago(String nombre, double descuentoAsociado, double limiteMaximoPago, int tipo) {
 		this();
 		this.nombre = nombre;
 		this.descuentoAsociado = descuentoAsociado;
@@ -54,9 +55,121 @@ public class MetodoPago implements Serializable{
 		this.tipo = tipo;
 	}
 	
+
 	
 	//Métodos
 	
+	/**
+	*<b>Description</b>: Este método se encarga de mostrar los métodos de pago disponibles con
+	*sus descuentos.
+	*El resultado puede cambiar si el cliente posee membresia y el tipo de esta.
+	*@param cliente : Se usa el objeto de tipo Cliente para acceder a su lista de métodos de pago.
+	*@return <b>string</b> : Se retorna un texto mostrando el nombre de los métodos de pago con
+	*sus descuentos.
+	*/
+	public static String mostrarMetodosDePago (Cliente cliente) {
+		String resultado = null;
+		int i = 1;
+		
+		//Se recorre la lista de los medios de pagos disponibles en la lista del cliente.
+		for (MetodoPago metodoPago : cliente.getMetodosDePago()) {
+				if (resultado == null) {
+					resultado = i + ". "+ metodoPago.getNombre()+ " - Descuento: " + (int)(metodoPago.getDescuentoAsociado()*100) + "% - Límite Máximo de pago: " + metodoPago.limiteMaximoPago + "\n";
+				}else {
+					if (metodoPago.getNombre().equals("Puntos")) {
+						resultado = resultado + i + ". "+ metodoPago.getNombre() + " Saldo: " + (int)(metodoPago.getLimiteMaximoPago());
+						continue;}
+					resultado = resultado + i + ". " + metodoPago.getNombre() + " - Descuento: " + (int)(metodoPago.getDescuentoAsociado()*100) + "% -  Límite Máximo de pago: " + metodoPago.limiteMaximoPago + "\n";
+					
+				}
+				i++;
+		}
+		return resultado;
+	}
+	
+	/**
+	*<b>Description</b>: Este método se encarga de asignar los métodos de pago disponibles por 
+	*su tipo de membresia a su lista de métodos de pago.
+	*que tiene el cliente.
+	*@param cliente : Se usa el objeto de tipo Cliente para revisar su membresia y poder asignar
+	*los métodos de pago.
+	*@return <b>Lista de métodos de pago</b> : Se retorna una lista mostrando los métodos de pago luego
+	*de realizar el filtrado por la membresia.
+	*/
+	public static ArrayList<MetodoPago> asignarMetodosDePago(Cliente cliente) {
+		//Se limpia la lista de métodos de pago, esto en caso de que el cliente haya adquirido una
+		//membresia.
+		MetodoPago puntos = null;
+		for (MetodoPago metodoPagoCliente : cliente.getMetodosDePago()) {
+			if (metodoPagoCliente.getNombre().equals("Puntos")) {
+				puntos = metodoPagoCliente;
+			}
+		}
+		cliente.getMetodosDePago().clear();
+		
+		//Se revisa si el cliente posee una membresia y de ser el caso, se asigna el canje de puntos.
+		//como método de pago.
+		Membresia tipoMembresia = cliente.getMembresia();
+		int tipoMembresiaInt= 0;
+		if (tipoMembresia != null) {
+			tipoMembresiaInt = tipoMembresia.getTipoMembresia();
+			if (puntos == null) {
+				cliente.setPuntos(2500);
+				puntos = new MetodoPago(0.0, "Puntos", cliente.getPuntos(), tipoMembresiaInt);
+			}
+		}
+		
+		//Se realiza un ciclo para filtrar los métodos de pago por el tipoMembresia del cliente
+		//y se añaden sus lista de métodos de pago.
+		for (MetodoPago metodoPago : SucursalCine.getMetodosDePagoDisponibles()) {
+			if (tipoMembresiaInt == metodoPago.getTipo()) {
+				cliente.getMetodosDePago().add(metodoPago);
+				
+			}
+		}
+		//Una vez se actualizan el arreglo de tipo MetodoPago en cliente, se añaden los puntos a este arreglo.
+		if (puntos != null) {
+			cliente.getMetodosDePago().add(puntos);
+		}
+		return cliente.getMetodosDePago();
+	}
+	
+	/**
+	*<b>Description</b>: Este método se encarga de crear varias instancias de los métodos de
+	*pago con distinto tipo. Esto para usarse en la funcionalidad 5.
+	*@param metodopago : Se usa el objeto de MetodoPago para crear sus instancias.
+	*@return <b>void</b> : No se retorna dato. Se toman los atributos del objeto para
+	*crear varias instancias. Estos valores son modificados dependiendo del número de tipo en
+	*el ciclo for.
+	*/
+	public static void metodoPagoPorTipo (MetodoPago metodopago) {
+		//Se realiza un ciclo para crear varias instancias de los métodos de pago variando sus atributos.
+		for (int i=1; i < 3; i++) {
+			String nombre = metodopago.getNombre();
+			int tipo = metodopago.getTipo() + i;
+			double descuentoAsociado = metodopago.getDescuentoAsociado() + 0.05 * tipo;
+			double limiteMaximoPago = metodopago.getLimiteMaximoPago() + 25000 * tipo;
+			new MetodoPago(nombre, descuentoAsociado, limiteMaximoPago, tipo);
+		}	
+	}
+	
+	/**
+	*<b>Description</b>: Este método de asignar el método de pago para ser usado.
+	*@param metodoPagoAUsar : Se usa el número de la selección para poder escoger el método de pago.
+	*@param cliente : Se usa el objeto de cliente para acceder a los métodos de pago.
+	*@return <b>MetodoPago</b> : Se retorna el método de pago que coincide con la opción seleccionada.
+	*/
+	public static MetodoPago usarMetodopago(Cliente cliente, int metodoPagoAUsar) {
+		MetodoPago usar = null;
+		//Se busca en los métodos de pago del cliente y se hace un apuntador al método de pago que
+		//coincida con el indice del método de pago más 1.
+		for (MetodoPago metodopago : cliente.getMetodosDePago()) {
+			if (metodoPagoAUsar == cliente.getMetodosDePago().indexOf(metodopago) + 1) {
+				usar = metodopago;
+				break;
+			}
+		} return usar;
+	}
 	
 	/**
 	 * Description : Este método se encarga de tomar el valor a pagar, aplicar el descuento del método de pago elegido por el cliente
