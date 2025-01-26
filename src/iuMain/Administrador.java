@@ -2551,7 +2551,133 @@ public class Administrador {
 													continue;
 												}
 
-
+												//Realizamos el pago y sumamos el precio acumulado para mostrar el valor real del ticket
+												precioAcumuladoComboProceso = precioAcumuladoComboProceso + precioComboProceso * (1 - metodoPagoProceso.getDescuentoAsociado());
+												precioComboProceso = metodoPagoProceso.realizarPago(precioComboProceso, clienteProceso);
 												
+												//Ponemos un delay en pantalla
+												System.out.println("\nEstamos procesando su pago, por favor espere...\n");
+												try {
+													Thread.sleep(3000);
+												}catch(InterruptedException e) {
+													e.printStackTrace();
+												}
 
+												//Realizamos el pago, según si el cliente decidió comprar un asiento de una película en presentación o en otro horario distinto
+												
+													
+													//Verificamos si el pago fue cubierto en su totalidad
+													if (precioComboProceso == 0) {
+														
+														System.out.println("\nPago realizado, La compra de su ticket fue exitosa\n");
+														
+														//Creamos nuevas instancias
+														Ticket ticketProceso=new Ticket(peliculaCombo,opcionHorarioPelicula,numAsientoProceso,clienteProceso.getCineActual());
+														new Bono(codigoBono,new Producto(productoCombo1.getNombre(),productoCombo1.getTamaño(),1),productoCombo1.getTipoProducto(),clienteProceso);
+														//Realizamos el proceso correspondiente luego de ser verificado
+														ticketProceso.procesarPagoRealizado(clienteProceso);
+														int filaProceso = Character.getNumericValue(numAsientoProceso.charAt(0));
+														int columnaProceso = Character.getNumericValue(numAsientoProceso.charAt(2));
+														peliculaCombo.modificarSalaVirtual(opcionHorarioPelicula, filaProceso-1, columnaProceso-1);
 
+														System.out.println("-----------------------Factura--------------------------");
+														System.out.println("------------------Este es tu combo!!---------------------");
+														System.out.println(peliculaCombo.getNombre()+ " y " + productoCombo1.getNombre()+ " " + productoCombo1.getTamaño()) ;;
+														System.out.println("------Felicidades, gracias por confiar en nosotros----");
+														System.out.println("\n");
+														pagoRealizado = true;
+														
+													}else {
+														
+														//Repetimos el proceso hasta validar el pago
+														System.out.println("Tiene un saldo pendiente de : " + precioComboProceso);
+														
+													}
+													
+												
+											
+											}while(!pagoRealizado);
+										}
+									}
+									else {
+										System.out.println("Gracias por tu tiempo... Adios ");
+									}
+									
+								
+								
+								
+								
+							}catch(NumberFormatException e) {
+								System.out.println("\nError, debes ingresar un dato numérico\n");
+								continue;
+							}
+							
+						}while(verificar);
+					}
+						
+					
+					else {
+						System.out.println("\n******Lastimosamente no has hecho compra de ningun alimento, por lo tanto no puedes calificar ninguno*******");
+					}
+				}
+				
+				/**Description: En esta parte hacemos un condicional dependiendo dla opcion que el cliente escoja, si el cliente escoje
+				 * la eleccion uno se le da la bienvenida para la calificacion de comidas y por el contrario si la eleccion es dos,
+				 * se le da la bienvenida al apartado de calificacion de peliculas.
+				 * Metodo mostrarHistorialDePeliculas: Este metodo le muestra a los usuarios los pedidos que han hecho, y por ende tambien verifica
+				 * si el cliente si ha hecho almenos una compra, esto es para evitar que un cliente pueda calificar una pelicula que no ha 
+				 * visto. Cuando se verifica que el cliente ha visto una pelicula se le da a escojer que pelicula desea calificar,
+				 * y el cliente le da una valoracion del 1 al 5 dependiendo de los gustos del usuario.
+				 */
+				 else if (eleccion==2) {
+					System.out.println("\n********Bienvenido al apartado de calificacion de peliculas********");
+					if(clienteProceso.getPeliculasDisponiblesParaCalificar().size() > 0) {
+						System.out.println("\n********Estas son las peliculas que has visto**********" + "\n" + clienteProceso.mostrarPeliculaParaCalificar());
+						Pelicula opcionPelicula=null;
+						int calificacion=0;
+						do {
+							try {
+								System.out.print("\n*********Seleccione la pelicula que deseas calificar********");
+								eleccion = Integer.parseInt(sc.nextLine());
+								if (eleccion == 0) {
+									break;
+								}
+								if (eleccion > clienteProceso.getPeliculasDisponiblesParaCalificar().size() || eleccion < 1) {
+									System.out.print("\n******Error en la seleccion de la pelicula******");
+									continue;
+								}
+								opcionPelicula = clienteProceso.getPeliculasDisponiblesParaCalificar().get(eleccion-1);
+								System.out.print("\nIngrese la calificacion del 1 al 5 que le vas a dar a esta pelicula: ");
+								calificacion = Integer.parseInt(sc.nextLine());
+								if (calificacion>=3) {
+									System.out.println("\n*********Escogiste la pelicula: " + opcionPelicula.getNombre()+ " " + opcionPelicula.getTipoDeFormato()+ "  y le diste una valoracion de " + calificacion + ", por lo tanto esta pelicula esta catalogada como bien calificada" +"***********");
+								}
+								else if	(calificacion<=2.99) {
+								System.out.println("\n*********Escogiste la pelicula: " + opcionPelicula.getNombre()+ " " + opcionPelicula.getTipoDeFormato()+ "  y le diste una valoracion de " + calificacion +", por lo tanto esta pelicula esta catalogada como mal calificada" + "***********");
+								}
+								else {
+									System.out.println("Error al calificar la pelicula, recuerda que es del 1 al 5");
+								}
+								
+								//Eliminamos la película de las películas disponibles para calificar del cliente
+								clienteProceso.getPeliculasDisponiblesParaCalificar().remove(opcionPelicula);
+								
+								//En este apartado setteamos las nuevas valoraciones hechas por el cliente y tambien aumentamos el numero de valoraciones realizadas
+								
+								Pelicula prueba1 = opcionPelicula;
+								double calificacionGlobalPeliculas;
+								calificacionGlobalPeliculas= (prueba1.getValoracion() * prueba1.getTotalEncuestasDeValoracionRealizadas()+calificacion)/(prueba1.getTotalEncuestasDeValoracionRealizadas()+1);
+								prueba1.setTotalEncuestasDeValoracionRealizadas(prueba1.getTotalEncuestasDeValoracionRealizadas()+1);
+								prueba1.verificarHorariosPeliculas();
+								prueba1.setValoracion(calificacionGlobalPeliculas);
+								
+								if ( !prueba1.verificarHorariosPeliculas()== true ) {
+									continue;
+								}
+								else {
+									System.out.println("Esta pelicula todavia tiene horarios");
+								}
+								/**Description: En esta parte del codigo, en modo de agradecimiento con el cliente por haber hecho la respectiva calificacion de 
+								 * comida o de peliculas le ofrecemos un combo a un precio muy especial, y ya, esta a opcion del cliente si quiere adquirir este
+								 * combo especial o no
+								 */	
