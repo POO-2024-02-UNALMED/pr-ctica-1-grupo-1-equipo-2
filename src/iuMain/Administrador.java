@@ -3070,3 +3070,195 @@ private static void ingresoZonaJuegos(Cliente ClienteActual) {
 				}
 			}while(casoValido);
 		}
+
+		else if (eleccion1==2) {
+			System.out.println("\n-----------------------------------------------------------------");
+	        System.out.println("Recuerde que debe tener saldo para acceder a los diferentes juegos");
+	        System.out.println("-------------------------------------------------------------------");
+	        System.out.println("\nSu tarjeta  :");
+	        espera(2000);
+			imprimirTarjeta(ClienteActual.getNombre(),ClienteActual.getCuenta().getSaldo());
+			finCiclo = true;
+			while(finCiclo) {
+				try {
+					System.out.println("\nDesea: ");
+					System.out.println("1. Ingresar a los juegos\n2. Recargar tarjeta cinemar\n3. Volver al menu principal\n4. Salir y Guardar");
+					int eleccion4 = (int)Administrador.readLong();
+					switch (eleccion4) {
+					case 1: barraCarga("Ingresando");Vcase= false;finCiclo= false; break;
+					case 2: barraCarga("Redirigiendo");Vcase = true;finCiclo= false; break;
+					case 3: barraCarga("Volviendo");Administrador.sc.nextLine();Administrador.inicio(ClienteActual);
+					case 4: barraCarga("Saliendo");Administrador.salirDelSistema();
+					default: finCiclo = true; break; 
+					}
+					
+				}catch(InputMismatchException e) {
+					System.out.println("\n-Error, debe ingresar un único dato numérico entre los disponibles-, vuelva a realizar el proceso");
+					Administrador.sc.nextLine();
+				}
+			}
+		}
+		else if (eleccion1==3) {
+			barraCarga("Volviendo");
+			Administrador.sc.nextLine();
+			Administrador.inicio(ClienteActual);
+		}
+		else if (eleccion1==4) {
+			barraCarga("Saliendo");
+			Administrador.salirDelSistema();
+		}
+		
+		
+	}while(Vcase);
+	
+	//fin proceso de pago
+	
+	
+	
+	
+	//Inicio proceso de codigos de descuento
+	boolean caso = true;
+	boolean redimioCodigo = false;
+	String generoCodigoPelicula = null;
+	
+	do {
+		
+		
+		try {
+			espera(1500);
+			redimioCodigo = false;
+			generoCodigoPelicula = null;
+			Arkade.reestablecerPrecioJuegos();
+			if (ClienteActual.getCodigosDescuento().size()==0){
+				System.out.println("\nNo tienes codigos de descuento asociados\n");
+				caso = false;
+				break;
+			}
+			System.out.println("\nEstos son los codigos de descuento que tienes por la compra de tiquetes en nuestro cine\n¿Cual deseas redimir?\n");
+			System.out.println(ClienteActual.mostrarCodigosDescuento());
+			int eleccion6 = (int)Administrador.readLong();
+			
+			
+			if (eleccion6 > 0 && eleccion6 <= ClienteActual.getCodigosDescuento().size()) {
+				generoCodigoPelicula = Ticket.encontrarGeneroCodigoPelicula(ClienteActual.getCodigosDescuento().get(eleccion6-1));
+				ClienteActual.getCodigosDescuento().remove(eleccion6-1);
+				System.out.println("Perfecto, se le asignará un descuento del 20% al precio de los juegos con categoría "+ generoCodigoPelicula);
+				espera(2500);
+				barraCarga("Aplicando descuento");
+				Arkade.AplicarDescuentoJuegos(generoCodigoPelicula);
+				caso = false;
+				redimioCodigo = true;
+			}
+			else if (eleccion6 == (ClienteActual.getCodigosDescuento().size()+1)) {
+				barraCarga("Ingresando a juegos");
+				caso = false;
+			}
+			else if (eleccion6 == (ClienteActual.getCodigosDescuento().size()+2)){
+				barraCarga("Saliendo");
+				Administrador.salirDelSistema();
+			}
+
+			else {
+				System.out.println("Opcion invalida");
+			}
+		}catch(InputMismatchException e) {
+			System.out.println("\n-Error, debe ingresar un único dato numérico entre los disponibles-, vuelva a realizar el proceso");
+			Administrador.sc.nextLine();
+		}
+
+	}while(caso);
+	
+	
+	
+	//inicio proceso de juegos
+	String game = null;
+	String generoJuego = null;
+	
+	do {
+		int eleccion7 = 0;
+		try {
+			generoJuego = null;
+			System.out.println(Arkade.mostrarJuegos());
+			eleccion7 =(int)Administrador.readLong();
+			
+
+		}catch(InputMismatchException e) {
+			System.out.println("\n-Error, debe ingresar un único dato numérico entre los disponibles-, vuelva a realizar el proceso");
+			Administrador.sc.nextLine();
+		}
+		
+		if (eleccion7 > 0 & eleccion7<=SucursalCine.getJuegos().size()) {
+			if (ClienteActual.getCuenta().getSaldo()>=SucursalCine.getJuegos().get(eleccion7-1).getValorServicio()) {
+				
+				ClienteActual.getCuenta().hacerPago(SucursalCine.getJuegos().get(eleccion7-1).getValorServicio());
+				System.out.println("El juego esta por comenzar, el nuevo saldo de tu tarjeta cinemar es : $" + ClienteActual.getCuenta().getSaldo());
+				espera(2000);
+				barraCarga("Iniciando");
+				generoJuego = SucursalCine.getJuegos().get(eleccion7-1).getGeneroServicio();
+				System.out.println("¡EL JUEGO HA EMPEZADO!\nAdivina la palabra relacionada con la categoria: "+generoJuego);
+				switch(generoJuego) {
+				
+				case "Acción": game = juego(new String[]{"BAM","ZAP","GUN"}); break;
+				case "Terror": game = juego(new String[]{"BOO","FEAR","EVIL"}); break;
+				case "Tecnología" : game = juego(new String[]{"POO","JAVA","5.0"}); break;
+				case "Comedia": game = juego(new String[]{"JAJA", "FUN", "LOL"}); break;
+				case "Drama": game = juego(new String[]{"CRY","GIRL", "LOVE"}); break;
+					
+				}
+				
+				boolean finWhile1 = true;
+				try {
+					while (finWhile1) {
+						System.out.println("\n¿Desea volver a jugar?\n1.SI\n2.NO");
+						int eleccion8 = (int)Administrador.readLong();
+						if (eleccion8==1) {
+							finWhile1 = false;
+						}
+						else if (eleccion8==2) {
+							caso = true;
+							finWhile1= false;
+						}
+					}	
+				}catch(InputMismatchException e) {
+					System.out.println("\nError en el proceso, debe ingresar un dato numerico, vuelva a realizar el proceso");
+					Administrador.sc.nextLine();
+				}
+				
+				
+			}
+			else {
+				
+				boolean finWhile = true;
+				try {
+					while (finWhile) {
+						System.out.println("Tu tarjeta no tiene saldo suficiente, por favor vuelva a ingresar para recargarla\n1.Volver al menu principal\n2.Volver a ingresar para recargar tarjeta\n3.Salir");
+						int option = (int)Administrador.readLong();
+							switch(option) {
+							case 1: Administrador.sc.nextLine();Administrador.inicio(ClienteActual);
+							case 2: ingresoZonaJuegos(ClienteActual);
+							case 3: Administrador.salirDelSistema();
+							default:  break;
+							}
+						}
+				}catch(InputMismatchException e) {
+					System.out.println("\n-Error, debe ingresar un único dato numérico entre los disponibles-, vuelva a realizar el proceso");
+					Administrador.sc.nextLine();
+				}
+				
+				
+			}
+		}
+		else if (eleccion7 == (SucursalCine.getJuegos().size()+1)) {
+			barraCarga("Volviendo");
+			Administrador.sc.nextLine();
+			Administrador.inicio(ClienteActual);
+		}
+		else if (eleccion7 ==(SucursalCine.getJuegos().size()+2)) {
+			barraCarga("Saliendo");
+			Administrador.salirDelSistema();
+		}
+	}while(!caso);
+	
+	
+	
+	
