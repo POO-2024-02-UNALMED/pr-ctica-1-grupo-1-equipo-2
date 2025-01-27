@@ -12,14 +12,26 @@ import gestionAplicacion.usuario.MetodoPago;
  * @author Jeronimo Rua Herrera
  * */
 public class ServicioComida extends Servicio {
-	
+	private static final long serialVersionUID = -6030069936241624529L;
+
 	public ServicioComida() {
 	}
 
 	public ServicioComida(String nombre) {
 		super(nombre);
 	}
-	
+
+	public static String mostrarBonos(Servicio servicio) {
+		int n = 0;
+		String bono = "\n ====== Tienes los siguientes bonos disponibles para comida ======\n" +
+				"\n0. No reclamar ningun bono.";
+		for (int i = 0; i < servicio.getBonosCliente().size(); i++) {
+			n = i + 1;
+			bono = bono + "\n" + n + ". " + servicio.getBonosCliente().get(i).getProducto().getNombre() + " " + servicio.getBonosCliente().get(i).getProducto().getTamaño() + " codigo: " + servicio.getBonosCliente().get(i).getCodigo();
+		}
+		return bono;
+	}
+
 	/**
 	 *@Override
 	 * Description: Este metodo filtra y actualiza los productos que hay en el inventerio dependiendo de la sucursal de cine y del tipo del producto
