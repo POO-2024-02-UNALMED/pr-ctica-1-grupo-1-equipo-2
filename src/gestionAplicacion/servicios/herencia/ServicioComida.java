@@ -22,6 +22,9 @@ public class ServicioComida extends Servicio {
 	}
 
 	public static String mostrarBonos(Servicio servicio) {
+		if (!(servicio instanceof ServicioComida)) {
+			return Servicio.mostrarBonos(servicio);
+		}
 		int n = 0;
 		String bono = "\n ====== Tienes los siguientes bonos disponibles para comida ======\n" +
 				"\n0. No reclamar ningun bono.";

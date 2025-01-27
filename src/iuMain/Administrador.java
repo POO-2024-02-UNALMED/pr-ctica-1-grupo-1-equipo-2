@@ -8,6 +8,7 @@ import gestionAplicacion.SucursalCine;
 import gestionAplicacion.proyecciones.*;
 import gestionAplicacion.servicios.*;
 import gestionAplicacion.servicios.herencia.Servicio;
+import gestionAplicacion.servicios.herencia.ServicioComida;
 import gestionAplicacion.usuario.*;
 import baseDatos.Deserializador;
 import baseDatos.Serializador;
@@ -2178,7 +2179,7 @@ public class Administrador {
 			if (0 < serviciProceso.getBonosCliente().size()) {
 				do {
 					try {
-						System.out.println(Servicio.mostrarBonos(serviciProceso));
+						System.out.println(ServicioComida.mostrarBonos(serviciProceso));
 						System.out.print("Seleccione una opcion: ");
 						eleccion = Integer.parseInt(sc.nextLine());
 						if (eleccion > serviciProceso.getBonosCliente().size()) {
