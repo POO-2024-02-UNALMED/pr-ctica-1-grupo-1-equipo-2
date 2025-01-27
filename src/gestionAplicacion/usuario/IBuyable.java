@@ -1,6 +1,9 @@
 package gestionAplicacion.usuario;
 
 
+import gestionAplicacion.servicios.Producto;
+import gestionAplicacion.servicios.herencia.Servicio;
+
 /**
  * @author Alan David Racines Casierra y Jeronimo Rua H
 *<b>Description</b>: Esta es la interfaz en la cual se harán los pagos. Por el momento, se declaran
@@ -34,4 +37,14 @@ public interface IBuyable {
 		return false;
 	}
 
+	static Producto validarBono(String codigo, Servicio servicio) {
+		Producto producto;
+		for (int i = 0; i < servicio.getBonosCliente().size(); i++) {
+			if (servicio.getBonosCliente().get(i).getCodigo().equals(codigo) && servicio.getBonosCliente().get(i).getTipoServicio().equalsIgnoreCase(servicio.getNombre())) {
+				producto = servicio.getBonosCliente().get(i).getProducto();
+				return producto;
+			}
+		}
+		return null;
+	}
 }
