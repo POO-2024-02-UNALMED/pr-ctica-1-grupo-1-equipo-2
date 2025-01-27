@@ -996,7 +996,7 @@ public class Administrador {
 				do {
 					opcionMenu = 0;
 					try {
-						System.out.println("\nEl valor a pagar por el ticket es: " + precioTicketProceso
+						System.out.println("\n" + ticketProceso.obtenerDetallesCompra(clienteProceso, precioTicketProceso)
 						+ "\nEste es el listado de los métodos de pago disponibles:\n" 
 						+ MetodoPago.mostrarMetodosDePago(clienteProceso));
 						System.out.print("\nElige una de las opciones disponibles para realizar el pago: " );
