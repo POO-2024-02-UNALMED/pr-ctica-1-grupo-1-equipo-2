@@ -24,15 +24,16 @@ public class ServicioComida extends Servicio {
 	public static String mostrarBonos(Servicio servicio) {
 		if (!(servicio instanceof ServicioComida)) {
 			return Servicio.mostrarBonos(servicio);
+		}else {
+			int n = 0;
+			String bono = "\n ====== Tienes los siguientes bonos disponibles para comida ======\n" +
+					"\n0. No reclamar ningun bono.";
+			for (int i = 0; i < servicio.getBonosCliente().size(); i++) {
+				n = i + 1;
+				bono = bono + "\n" + n + ". " + servicio.getBonosCliente().get(i).getProducto().getNombre() + " " + servicio.getBonosCliente().get(i).getProducto().getTamaño() + " codigo: " + servicio.getBonosCliente().get(i).getCodigo();
+			}
+			return bono;
 		}
-		int n = 0;
-		String bono = "\n ====== Tienes los siguientes bonos disponibles para comida ======\n" +
-				"\n0. No reclamar ningun bono.";
-		for (int i = 0; i < servicio.getBonosCliente().size(); i++) {
-			n = i + 1;
-			bono = bono + "\n" + n + ". " + servicio.getBonosCliente().get(i).getProducto().getNombre() + " " + servicio.getBonosCliente().get(i).getProducto().getTamaño() + " codigo: " + servicio.getBonosCliente().get(i).getCodigo();
-		}
-		return bono;
 	}
 
 	/**
