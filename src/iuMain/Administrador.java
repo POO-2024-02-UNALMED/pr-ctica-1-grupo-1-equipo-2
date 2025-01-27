@@ -3750,5 +3750,12 @@ public static void mostrarBono(ArrayList<Producto> productos, int numeroAleatori
 
 	
 //------------------------------------------------------------------------------------------------------------------	
-		
+/**
+ * Good job muchachos, gracias por esforzarse, solucionar problemas es la vida diaria de un desarollar,
+ * aprender no solo a escribir, sino leer y modificar codigo son las habilidades necesarias
+ * para cualquier desarrollador de codigo. Fue un placer haber trabajado con ustedes
+ * gracias por su compromiso, y atencion, este semestre no ha sido facil para ningun estudiante,
+ * y ahora si ustedes se esforzaron hasta el final, ojala el tiempo y las demas personas
+ * noten su esfuerzo y sean recompenzados y reconocidos de miles de diferentes formas, No se rindan!
+ * Monitor esteban a usted Tambien muchas gracias 😉😉**/
 	
